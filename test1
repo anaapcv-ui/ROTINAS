@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Rotina semanal interativa para crianças com TDAH - com alarmes visuais e sonoros, calendário semanal e controle parental">
+    <meta name="theme-color" content="#667eea">
+    <title>Minha Rotina Semanal 🌟 | TDAH Helper</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiTWluaGEgUm90aW5hIFNFTUFOQUwg8J+MmSIsInNob3J0X25hbWUiOiJSb3RpbmEgVERBSCIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjNjY3ZWVhIiwidGhlbWVfY29sb3IiOiIjNjY3ZWVhIn0=">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f5576c;
+            --extra: #ff9500;
+            --weekend: #ff6b6b;
+            --success: #48bb78;
+            --warning: #ffd93d;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* HEADER */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            animation: bounceIn 0.8s ease;
+        }
+        
+        .header h1 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        
+        .date-badge {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        /* VIEW TOGGLE */
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .view-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .view-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.35);
+        }
+        
+        .view-btn.active {
+            background: white;
+            color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        /* WEEKEND BADGE */
+        .weekend-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--weekend);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: pulse-soft 2s infinite;
+            box-shadow: 0 4px 15px rgba(255,107,107,0.4);
+        }
+        
+        /* WEEKLY CALENDAR GRID */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .day-column {
+            background: white;
+            border-radius: 20px;
+            padding: 15px 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            min-height: 450px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .day-column:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        .day-column.weekend {
+            background: linear-gradient(135deg, #fff0f0 0%, #ffffff 100%);
+            border: 3px solid var(--weekend);
+        }
+        
+        .day-column.today {
+            border: 4px solid var(--accent);
+            animation: pulse-border 2s infinite;
+            position: relative;
+        }
+        
+        .day-column.today::before {
+            content: 'HOJE';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 4px 15px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(245,87,108,0.4);
+        }
+        
+        .day-header {
+            text-align: center;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #f0f0f0;
+            margin-bottom: 12px;
+        }
+        
+        .day-name {
+            font-size: 1rem;
+            font-weight: 900;
+            color: #2d3748;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .day-column.weekend .day-name {
+            color: var(--weekend);
+        }
+        
+        .day-activities {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+        
+        .day-activities::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .day-activities::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        /* ACTIVITY SLOTS */
+        .activity-slot {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .activity-slot:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+        
+        .activity-slot.extracurricular {
+            background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+            border-left-color: var(--extra);
+            border: 2px solid var(--extra);
+            box-shadow: 0 4px 15px rgba(255,149,0,0.15);
+        }
+        
+        .activity-slot.active-now {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            border-left-color: var(--success);
+            border-color: var(--success);
+            animation: pulse-soft 2s infinite;
+        }
+        
+        .slot-icon {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .slot-time {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .activity-slot.extracurricular .slot-time {
+            color: var(--extra);
+        }
+        
+        .slot-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #2d3748;
+            line-height: 1.3;
+        }
+        
+        .extracurricular-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--extra);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 900;
+            box-shadow: 0 3px 10px rgba(255,149,0,0.4);
+            border: 2px solid white;
+        }
+        
+        /* DAILY VIEW */
+        .daily-view {
+            display: none;
+        }
+        
+        .daily-view.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .day-selector {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            margin-bottom: 20px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .day-selector::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .day-btn {
+            flex-shrink: 0;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            min-width: 85px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .day-btn:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.35);
+        }
+        
+        .day-btn.active {
+            background: white;
+            color: var(--primary);
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .day-btn.weekend {
+            background: rgba(255,107,107,0.3);
+        }
+        
+        .day-btn.weekend.active {
+            background: var(--weekend);
+            color: white;
+        }
+        
+        .day-label {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+        
+        .day-icon {
+            font-size: 1.2rem;
+        }
+        
+        /* PROGRESS BAR */
+        .progress-container {
+            background: rgba(255,255,255,0.3);
+            height: 12px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb 0%, var(--accent) 100%);
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(245,87,108,0.4);
+        }
+        
+        /* ACTIVITY CARDS */
+        .activity-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .activity-card.active {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+            animation: pulse-soft 2s infinite;
+        }
+        
+        .activity-card.completed {
+            opacity: 0.6;
+            background: #f7fafc;
+            border-color: #e2e8f0;
+        }
+        
+        .activity-card.completed .icon {
+            filter: grayscale(100%);
+            opacity: 0.7;
+        }
+        
+        .activity-card.extracurricular {
+            border-color: var(--extra);
+            background: linear-gradient(135deg, #fffaf0 0%, #ffffff 100%);
+        }
+        
+        .activity-card.extracurricular::before {
+            content: '⭐ EXTRA';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--extra);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(255,149,0,0.3);
+        }
+        
+        .icon {
+            font-size: 2.5rem;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            border-radius: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+        
+        .activity-card:hover .icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .activity-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .activity-info h3 {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 6px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+        
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .duration {
+            color: #718096;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .timer-display {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--accent);
+            background: linear-gradient(135deg, #ffe0e0 0%, #fff5f5 100%);
+            padding: 12px 18px;
+            border-radius: 15px;
+            font-variant-numeric: tabular-nums;
+            min-width: 90px;
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            border: 2px solid #fed7d7;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-badge.now {
+            background: var(--accent);
+            color: white;
+            animation: blink 1.5s infinite;
+            box-shadow: 0 4px 15px rgba(245,87,108,0.4);
+        }
+        
+        /* CONTROLS */
+        .controls {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+        
+        .btn {
+            background: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2d3748;
+        }
+        
+        .btn:hover {
+            transform: scale(1.15) rotate(10deg);
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn.parent {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: auto;
+            padding: 0 25px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            gap: 8px;
+            height: 55px;
+        }
+        
+        .btn.parent:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+        }
+        
+        /* ALARM MODAL */
+        .alarm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .alarm-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .alarm-content {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            border: 4px solid var(--accent);
+        }
+        
+        .alarm-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: shake 0.6s infinite;
+            display: block;
+        }
+        
+        .alarm-content h2 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-weight: 900;
+        }
+        
+        .alarm-content p {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        
+        .alarm-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 800;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        }
+        
+        .alarm-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(102,126,234,0.5);
+        }
+        
+        /* PARENT AREA */
+        .parent-login-overlay, .parent-panel-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 5000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .parent-login-overlay.show, .parent-panel-overlay.show {
+            display: flex;
+        }
+        
+        .login-box {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+        }
+        
+        .login-box h2 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+        }
+        
+        .login-box p {
+            color: #718096;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+        
+        .pin-display {
+            font-size: 2.5rem;
+            letter-spacing: 12px;
+            margin: 20px 0;
+            color: #2d3748;
+            font-weight: 900;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .pin-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        
+        .pin-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: #f7fafc;
+            color: #2d3748;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .pin-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .pin-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .pin-btn.action {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .login-error {
+            color: var(--accent);
+            margin-top: 15px;
+            font-weight: 700;
+            display: none;
+            animation: shake 0.5s;
+        }
+        
+        .parent-panel {
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .panel-header h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .panel-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .panel-btn.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        
+        .panel-btn.secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .panel-btn.danger {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .panel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .extracurricular-editor {
+            background: linear-gradient(135deg, #fffbeb 0%, #fffaf0 100%);
+            border: 2px solid var(--extra);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+            margin-bottom: 15px;
+        }
+        
+        .editor-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .editor-field label {
+            font-size: 0.8rem;
+            color: var(--extra);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .editor-field input {
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .editor-field input:focus {
+            outline: none;
+            border-color: var(--extra);
+            box-shadow: 0 0 0 3px rgba(255,149,0,0.1);
+        }
+        
+        .day-checkboxes {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .day-checkbox {
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .day-checkbox.active {
+            background: var(--extra);
+            color: white;
+            border-color: var(--extra);
+            box-shadow: 0 4px 15px rgba(255,149,0,0.3);
+        }
+        
+        .add-btn {
+            width: 100%;
+            padding: 18px;
+            border: 3px dashed var(--extra);
+            border-radius: 15px;
+            background: transparent;
+            color: var(--extra);
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .add-btn:hover {
+            background: var(--extra);
+            color: white;
+            border-style: solid;
+        }
+        
+        /* ANIMATIONS */
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse-soft {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 87, 108, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(245, 87, 108, 0); }
+        }
+        
+        @keyframes pulse-border {
+            0%, 100% { border-color: var(--accent); }
+            50% { border-color: transparent; }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: confetti-fall 3s ease-out forwards;
+            z-index: 9999;
+        }
+        
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .calendar-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .day-column {
+                min-height: 350px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+            .day-column {
+                min-height: auto;
+                max-height: 500px;
+            }
+            .editor-grid {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                bottom: 20px;
+                right: 20px;
+            }
+            .btn {
+                width: 55px;
+                height: 55px;
+                font-size: 1.2rem;
+            }
+            .btn.parent {
+                padding: 0 18px;
+                font-size: 0.85rem;
+                height: 50px;
+            }
+            .activity-card {
+                padding: 15px;
+            }
+            .icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            .timer-display {
+                font-size: 1.3rem;
+                padding: 10px 14px;
+                min-width: 80px;
+            }
+        }
+        
+        /* UTILITIES */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        
+        /* LOADING SCREEN */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: opacity 0.5s;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+        <h2 style="font-size: 1.5rem; font-weight: 800;">Carregando Rotina...</h2>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🌟 Minha Rotina Semanal 🌟</h1>
+            <div class="date-badge" id="currentDate">Carregando...</div>
+        </header>
+
+        <!-- View Toggle -->
+        <div class="view-toggle">
+            <button class="view-btn active" onclick="switchView('daily')" id="btnDaily">📅 Hoje</button>
+            <button class="view-btn" onclick="switchView('weekly')" id="btnWeekly">📆 Semana</button>
+        </div>
+
+        <!-- Weekly View -->
+        <div class="calendar-view" id="weeklyView" style="display: none;">
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <!-- Daily View -->
+        <div class="daily-view active" id="dailyView">
+            <div class="day-selector" id="daySelector"></div>
+            <div class="progress-container">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div id="activitiesList"></div>
+        </div>
+    </div>
+
+    <!-- Floating Controls -->
+    <div class="controls">
+        <button class="btn" onclick="toggleSound()" id="soundBtn" title="Som">🔔</button>
+        <button class="btn parent" onclick="openParentLogin()" title="Área dos Pais">
+            <span>⚙️</span>
+            <span style="display: none;" class="show-text">Pais</span>
+        </button>
+        <button class="btn" onclick="resetDay()" title="Reiniciar">🔄</button>
+    </div>
+
+    <!-- Alarm Modal -->
+    <div class="alarm-modal" id="alarmModal">
+        <div class="alarm-content">
+            <span class="alarm-icon" id="alarmIcon">⏰</span>
+            <h2 id="alarmTitle">Hora de Mudar!</h2>
+            <p id="alarmMessage">Vamos para a próxima atividade!</p>
+            <button class="alarm-btn" onclick="dismissAlarm()">OK, Vamos lá! 👍</button>
+        </div>
+    </div>
+
+    <!-- Parent Login -->
+    <div class="parent-login-overlay" id="parentLogin">
+        <div class="login-box">
+            <h2>🔒 Área dos Pais</h2>
+            <p>Digite o PIN de 4 dígitos para configurar</p>
+            <div class="pin-display" id="pinDisplay">••••</div>
+            <div class="pin-pad">
+                <button class="pin-btn" onclick="enterPin(1)">1</button>
+                <button class="pin-btn" onclick="enterPin(2)">2</button>
+                <button class="pin-btn" onclick="enterPin(3)">3</button>
+                <button class="pin-btn" onclick="enterPin(4)">4</button>
+                <button class="pin-btn" onclick="enterPin(5)">5</button>
+                <button class="pin-btn" onclick="enterPin(6)">6</button>
+                <button class="pin-btn" onclick="enterPin(7)">7</button>
+                <button class="pin-btn" onclick="enterPin(8)">8</button>
+                <button class="pin-btn" onclick="enterPin(9)">9</button>
+                <button class="pin-btn action" onclick="clearPin()">⌫</button>
+                <button class="pin-btn" onclick="enterPin(0)">0</button>
+                <button class="pin-btn action" onclick="cancelLogin()">✕</button>
+            </div>
+            <div class="login-error" id="loginError">PIN incorreto! Tente novamente.</div>
+        </div>
+    </div>
+
+    <!-- Parent Panel -->
+    <div class="parent-panel-overlay" id="parentPanel">
+        <div class="parent-panel">
+            <div class="panel-header">
+                <h2>⚙️ Configurações dos Pais</h2>
+                <div class="panel-controls">
+                    <button class="panel-btn secondary" onclick="exportData()">📥 Exportar</button>
+                    <button class="panel-btn secondary" onclick="importData()">📤 Importar</button>
+                    <button class="panel-btn danger" onclick="closeParentPanel()">✕ Fechar</button>
+                    <button class="panel-btn primary" onclick="saveSettings()">💾 Salvar</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; padding: 15px; background: #f0f0f0; border-radius: 12px;">
+                <h4 style="color: #667eea; margin-bottom: 10px;">📋 Instruções Rápidas:</h4>
+                <ul style="margin-left: 20px; color: #555; font-size: 0.9rem; line-height: 1.6;">
+                    <li>Configure as atividades extracurriculares abaixo</li>
+                    <li>Selecione os dias da semana para cada atividade</li>
+                    <li>Clique em "Salvar" para aplicar as mudanças</li>
+                    <li>Use Exportar/Importar para fazer backup</li>
+                </ul>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: #333; display: flex; align-items: center; gap: 10px;">
+                <span style="color: var(--extra);">⭐</span> Atividades Extracurriculares
+            </h3>
+            <div id="extracurricularList"></div>
+
+            <button class="add-btn" onclick="addExtracurricular()">
+                <span>➕</span> Adicionar Nova Atividade Extra
+            </button>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+                <h4 style="margin-bottom: 15px; color: #333;">🔐 Alterar PIN de Acesso</h4>
+                <div style="display: flex; gap: 10px; max-width: 300px;">
+                    <input type="password" id="newPin1" maxlength="1" style="width: 60px; text-align: center; font-size: 1.5rem; padding: 10px; border: 2px solid #ddd; border-radius: 10px;" placeholder="•">
+                    <input type="password" id="newPin2" maxlength="1" style="width: 60px; text-align: center; font-size: 1.5rem; padding: 10px; border: 2px solid #ddd; border-radius: 10px;" placeholder="•">
+                    <input type="password" id="newPin3" maxlength="1" style="width: 60px; text-align: center; font-size: 1.5rem; padding: 10px; border: 2px solid #ddd; border-radius: 10px;" placeholder="•">
+                    <input type="password" id="newPin4" maxlength="1" style="width: 60px; text-align: center; font-size: 1.5rem; padding: 10px; border: 2px solid #ddd; border-radius: 10px;" placeholder="•">
+                </div>
+                <button class="panel-btn primary" onclick="changePin()" style="margin-top: 15px;">🔒 Alterar PIN</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados da rotina semanal com atividades extracurriculares
+        const defaultSchedule = {
+            0: { name: 'Domingo', type: 'weekend', activities: [
+                { icon: '🌅', title: 'Acordar', start: '08:30', duration: 30, color: '#FFD93D' },
+                { icon: '🦷', title: 'Higiene', start: '09:00', duration: 15, color: '#6BCB77' },
+                { icon: '🍳', title: 'Café', start: '09:15', duration: 45, color: '#FF6B6B' },
+                { icon: '🎮', title: 'Lazer', start: '10:00', duration: 120, color: '#F39C12' },
+                { icon: '🍽️', title: 'Almoço', start: '12:30', duration: 60, color: '#E74C3C' },
+                { icon: '💤', title: 'Descanso', start: '13:30', duration: 60, color: '#3498DB' },
+                { icon: '🏃', title: 'Brincar', start: '15:00', duration: 180, color: '#1ABC9C' },
+                { icon: '🍽️', title: 'Jantar', start: '19:00', duration: 45, color: '#E74C3C' },
+                { icon: '🎬', title: 'Filme', start: '20:00', duration: 120, color: '#8E44AD' },
+                { icon: '🦷', title: 'Higiene', start: '22:30', duration: 15, color: '#2980B9' },
+                { icon: '🌙', title: 'Dormir', start: '23:00', duration: 0, color: '#2C3E50' }
+            ]},
+            1: { name: 'Segunda', type: 'weekday', activities: [
+                { icon: '🌅', title: 'Acordar', start: '07:00', duration: 30, color: '#FFD93D' },
+                { icon: '🦷', title: 'Higiene', start: '07:30', duration: 15, color: '#6BCB77' },
+                { icon: '🍳', title: 'Café', start: '07:45', duration: 30, color: '#FF6B6B' },
+                { icon: '🎒', title: 'Escola', start: '08:30', duration: 270, color: '#4D96FF' },
+                { icon: '📖', title: 'Kumon', start: '13:20', duration: 60, color: '#ff9500', extracurricular: true },
+                { icon: '🍎', title: 'Lanche', start: '14:30', duration: 20, color: '#E67E22' },
+                { icon: '📚', title: 'Tarefas', start: '15:00', duration: 60, color: '#9B59B6' },
+                { icon: '🥋', title: 'Jiu Jitsu', start: '18:00', duration: 90, color: '#ff9500', extracurricular: true },
+                { icon: '🍽️', title: 'Jantar', start: '19:45', duration: 30, color: '#E74C3C' },
+                { icon: '🦷', title: 'Higiene', start: '20:30', duration: 15, color: '#2980B9' },
+                { icon: '🌙', title: 'Dormir', start: '21:00', duration: 0, color: '#2C3E50' }
+            ]},
+            2: { name: 'Terça', type: 'weekday', activities: [
+                { icon: '🌅', title: 'Acordar', start: '07:00', duration: 30, color: '#FFD93D' },
+                { icon: '🦷', title: 'Higiene', start: '07:30', duration: 15, color: '#6BCB77' },
+                { icon: '🍳', title: 'Café', start: '07:45', duration: 30, color: '#FF6B6B' },
+                { icon: '🎒', title: 'Escola', start: '08:30', duration: 270, color: '#4D96FF' },
+                { icon: '🍎', title: 'Lanche', start: '14:00', duration: 20, color: '#E67E22' },
+                { icon: '📚', title: 'Tarefas', start: '14:30', duration: 60, color: '#9B59B6' },
+                { icon: '🏐', title: 'Vôlei/Futebol', start: '15:45', duration: 90, color: '#ff9500', extracurricular: true },
+                { icon: '🍽️', title: 'Jantar', start: '17:30', duration: 30, color: '#E74C3C' },
+                { icon: '🎨', title: 'Lazer', start: '18:30', duration: 90, color: '#F39C12' },
+                { icon: '🦷', title: 'Higiene', start: '20:30', duration: 15, color: '#2980B9' },
+                { icon: '🌙', title: 'Dormir', start: '21:00', duration: 0, color: '#2C3E50' }
+            ]},
+            3: { name: 'Quarta', type: 'weekday', activities: [
+                { icon: '🌅', title: 'Acordar', start: '07:00', duration: 30, color: '#FFD93D' },
+                { icon: '🦷', title: 'Higiene', start: '07:30', duration: 15, color: '#6BCB77' },
+                { icon: '🍳', title: 'Café', start: '07:45', duration: 30, color: '#FF6B6B' },
+                { icon: '🎒', title: 'Escola', start: '08:30', duration: 270, color: '#4D96FF' },
+                { icon: '🍎', title: 'Lanche', start: '14:00', duration: 20, color: '#E67E22' },
+                { icon: '📚', title: 'Tarefas', start: '14:30', duration: 60, color: '#9B59B6' },
+                { icon: '🥋', title: 'Jiu Jitsu', start: '18:00', duration: 90, color: '#ff9500', extracurricular: true },
+                { icon: '🍽️', title: 'Jantar', start: '19:45', duration: 30, color: '#E74C3C' },
+                { icon: '🦷', title: 'Higiene', start: '20:30', duration: 15, color: '#2980B9' },
+                { icon: '🌙', title: 'Dormir', start: '21:00', duration: 0, color: '#2C3E50' }
+            ]},
+            4: { name: 'Quinta', type: 'weekday', activities: [
+                { icon: '🌅', title: 'Acordar', start: '07:00', duration: 30, color: '#FFD93D' },
+                { icon: '🦷', title: 'Higiene', start: '07:30', duration: 15, color: '#6BCB77' },
+                { icon: '🍳', title: 'Café', start: '07:45', duration: 30, color: '#FF6B6B' },
+                { icon: '🎒', title: 'Escola', start: '08:30', duration: 270, color: '#4D96FF' },
+                { icon: '📖', title: 'Kumon', start: '13:20', duration: 60, color: '#ff9500', extracurricular: true },
+                { icon: '🍎', title: 'Lanche', start: '14:30', duration: 20, color: '#E67E22' },
+                { icon: '📚', title: 'Tarefas', start: '15:00', duration: 45, color: '#9B59B6' },
+                { icon: '🏐', title: 'Vôlei/Futebol', start: '15:45', duration: 90, color: '#ff9500', extracurricular: true },
+                { icon: '🍽️', title: 'Jantar', start: '17:45', duration: 30, color: '#E74C3C' },
+                { icon: '🎨', title: 'Lazer', start: '18:30', duration: 90, color: '#F39C12' },
+                { icon: '🦷', title: 'Higiene', start: '20:30', duration: 15, color: '#2980B9' },
+                { icon: '🌙', title: 'Dormir', start: '21:00', duration: 0, color: '#2C3E50' }
+            ]},
+            5: { name: 'Sexta', type: 'weekday', activities: [
+                { icon: '🌅', title: 'Acordar', start: '07:00', duration: 30, color: '#FFD93D' },
+                { icon: '🦷', title: 'Higiene', start: '07:30', duration: 15, color: '#6BCB77' },
+                { icon: '🍳', title: 'Café', start: '07:45', duration: 30, color: '#FF6B6B' },
+                { icon: '🎒', title: 'Escola', start: '08:30', duration: 270, color: '#4D96FF' },
+                { icon: '🍎', title: 'Lanche', start: '14:00', duration: 20, color: '#E67E22' },
+                { icon: '📚', title: 'Tarefas', start: '14:30', duration: 60, color: '#9B59B6' },
+                { icon: '🎮', title: 'Lazer', start: '16:00', duration: 120, color: '#F39C12' },
+                { icon: '🍽️', title: 'Jantar', start: '19:00', duration: 30, color: '#E74C3C' },
+                { icon: '🎬', title: 'Filme', start: '19:45', duration: 90, color: '#8E44AD' },
+                { icon: '🦷', title: 'Higiene', start: '21:30', duration: 15, color: '#2980B9' },
+                { icon: '🌙', title: 'Dormir', start: '22:00', duration: 0, color: '#2C3E50' }
+            ]},
+            6: { name: 'Sábado', type: 'weekend', activities: [
+                { icon: '🌅', title: 'Acordar', start: '08:30', duration: 30, color: '#FFD93D' },
+                { icon: '🦷', title: 'Higiene', start: '09:00', duration: 15, color: '#6BCB77' },
+                { icon: '🍳', title: 'Café', start: '09:15', duration: 45, color: '#FF6B6B' },
+                { icon: '🎮', title: 'Lazer', start: '10:00', duration: 120, color: '#F39C12' },
+                { icon: '🍽️', title: 'Almoço', start: '12:30', duration: 60, color: '#E74C3C' },
+                { icon: '💤', title: 'Descanso', start: '13:30', duration: 60, color: '#3498DB' },
+                { icon: '🏃', title: 'Brincar', start: '15:00', duration: 180, color: '#1ABC9C' },
+                { icon: '🍽️', title: 'Jantar', start: '19:00', duration: 45, color: '#E74C3C' },
+                { icon: '🎬', title: 'Filme', start: '20:00', duration: 120, color: '#8E44AD' },
+                { icon: '🦷', title: 'Higiene', start: '22:30', duration: 15, color: '#2980B9' },
+                { icon: '🌙', title: 'Dormir', start: '23:00', duration: 0, color: '#2C3E50' }
+            ]}
+        };
+
+        // Estado global
+        let schedule = JSON.parse(localStorage.getItem('tdah_schedule')) || JSON.parse(JSON.stringify(defaultSchedule));
+        let currentView = 'daily';
+        let selectedDay = new Date().getDay();
+        let parentPin = localStorage.getItem('tdah_pin') || '1234';
+        let soundEnabled = localStorage.getItem('tdah_sound') !== 'false';
+        let currentPinInput = '';
+        let audioContext = null;
+        let completedActivities = new Set();
+        let currentEditingExtras = [];
+
+        // Inicialização
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hidden');
+                init();
+            }, 800);
+        };
+
+        function init() {
+            updateDate();
+            renderDaySelector();
+            renderDailyView();
+            renderWeeklyView();
+            setInterval(checkCurrentActivity, 1000);
+            setInterval(updateTimers, 1000);
+            document.addEventListener('click', initAudio, { once: true });
+            
+            if (!soundEnabled) document.getElementById('soundBtn').textContent = '🔕';
+        }
+
+        function initAudio() {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', options);
+        }
+
+        function switchView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (view === 'daily') {
+                document.getElementById('btnDaily').classList.add('active');
+                document.getElementById('dailyView').classList.add('active');
+                document.getElementById('weeklyView').style.display = 'none';
+                renderDailyView();
+            } else {
+                document.getElementById('btnWeekly').classList.add('active');
+                document.getElementById('dailyView').classList.remove('active');
+                document.getElementById('weeklyView').style.display = 'block';
+                renderWeeklyView();
+            }
+        }
+
+        // Renderização Semanal
+        function renderWeeklyView() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            const today = new Date().getDay();
+
+            for (let day = 0; day < 7; day++) {
+                const dayData = schedule[day];
+                const isWeekend = dayData.type === 'weekend';
+                const isToday = day === today;
+
+                const column = document.createElement('div');
+                column.className = `day-column ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}`;
+                
+                column.innerHTML = `
+                    <div class="day-header">
+                        <div class="day-name">${dayData.name} ${isWeekend ? '<span class="weekend-badge">🎉 FDS</span>' : ''}</div>
+                    </div>
+                    <div class="day-activities"></div>
+                `;
+
+                const container = column.querySelector('.day-activities');
+                dayData.activities.forEach(activity => {
+                    const slot = document.createElement('div');
+                    slot.className = `activity-slot ${activity.extracurricular ? 'extracurricular' : ''}`;
+                    slot.innerHTML = `
+                        ${activity.extracurricular ? '<div class="extracurricular-badge">★</div>' : ''}
+                        <span class="slot-icon">${activity.icon}</span>
+                        <div class="slot-time">${activity.start}</div>
+                        <div class="slot-title">${activity.title}</div>
+                    `;
+                    slot.onclick = () => {
+                        selectedDay = day;
+                        switchView('daily');
+                    };
+                    container.appendChild(slot);
+                });
+
+                grid.appendChild(column);
+            }
+        }
+
+        // Renderização Diária
+        function renderDaySelector() {
+            const selector = document.getElementById('daySelector');
+            selector.innerHTML = '';
+
+            for (let day = 0; day < 7; day++) {
+                const dayData = schedule[day];
+                const isWeekend = dayData.type === 'weekend';
+                const isSelected = day === selectedDay;
+
+                const btn = document.createElement('button');
+                btn.className = `day-btn ${isWeekend ? 'weekend' : ''} ${isSelected ? 'active' : ''}`;
+                btn.innerHTML = `
+                    <div class="day-label">${dayData.name.substring(0, 3)}</div>
+                    <div class="day-icon">${isWeekend ? '🎉' : '📚'}</div>
+                `;
+                btn.onclick = () => {
+                    selectedDay = day;
+                    renderDaySelector();
+                    renderDailyView();
+                };
+                selector.appendChild(btn);
+            }
+        }
+
+        function renderDailyView() {
+            const container = document.getElementById('activitiesList');
+            container.innerHTML = '';
+
+            const dayData = schedule[selectedDay];
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const isToday = selectedDay === now.getDay();
+
+            dayData.activities.forEach((activity, index) => {
+                const [h, m] = activity.start.split(':').map(Number);
+                const activityTime = h * 60 + m;
+                const endTime = activityTime + activity.duration;
+                const isActive = isToday && currentTime >= activityTime && currentTime < endTime;
+                const isCompleted = isToday && currentTime >= endTime;
+
+                const card = document.createElement('div');
+                card.className = `activity-card ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''} ${activity.extracurricular ? 'extracurricular' : ''}`;
+                
+                if (isActive) {
+                    card.innerHTML += '<span class="status-badge now">AGORA</span>';
+                }
+
+                card.innerHTML += `
+                    <div class="icon" style="background: ${activity.color}20; color: ${activity.color};">${activity.icon}</div>
+                    <div class="activity-info">
+                        <span class="time-badge">${activity.start}</span>
+                        <h3>${activity.title}</h3>
+                        <div class="duration">⏱️ ${activity.duration} minutos</div>
+                    </div>
+                    <div class="timer-display" id="timer-${selectedDay}-${index}" style="${!isActive ? 'opacity: 0.3;' : ''}">
+                        ${isActive ? formatTime(endTime - currentTime) : '--:--'}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            updateProgress();
+        }
+
+        function formatTime(minutes) {
+            const mins = Math.floor(minutes);
+            const secs = Math.floor((minutes - mins) * 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function checkCurrentActivity() {
+            if (currentView !== 'daily') return;
+            
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const isToday = selectedDay === now.getDay();
+            if (!isToday) return;
+
+            const dayData = schedule[selectedDay];
+            dayData.activities.forEach((activity, index) => {
+                const [h, m] = activity.start.split(':').map(Number);
+                const activityTime = h * 60 + m;
+                const endTime = activityTime + activity.duration;
+
+                if (currentTime === activityTime && now.getSeconds() === 0) {
+                    showAlarm(activity, 'start');
+                    renderDailyView();
+                }
+                
+                if (currentTime === endTime && now.getSeconds() === 0 && !completedActivities.has(`${selectedDay}-${index}`)) {
+                    completedActivities.add(`${selectedDay}-${index}`);
+                    showAlarm(activity, 'end');
+                    renderDailyView();
+                    createConfetti();
+                }
+            });
+        }
+
+        function updateTimers() {
+            if (currentView !== 'daily') return;
+            
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const currentSeconds = now.getSeconds();
+            const isToday = selectedDay === now.getDay();
+            if (!isToday) return;
+
+            const dayData = schedule[selectedDay];
+            dayData.activities.forEach((activity, index) => {
+                const [h, m] = activity.start.split(':').map(Number);
+                const activityTime = h * 60 + m;
+                const endTime = activityTime + activity.duration;
+                const timerEl = document.getElementById(`timer-${selectedDay}-${index}`);
+                
+                if (timerEl && currentTime >= activityTime && currentTime < endTime) {
+                    const remaining = (endTime - currentTime) * 60 - currentSeconds;
+                    const mins = Math.floor(remaining / 60);
+                    const secs = remaining % 60;
+                    timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    timerEl.style.opacity = '1';
+                }
+            });
+        }
+
+        function showAlarm(activity, type) {
+            const modal = document.getElementById('alarmModal');
+            const icon = document.getElementById('alarmIcon');
+            const title = document.getElementById('alarmTitle');
+            const message = document.getElementById('alarmMessage');
+
+            if (type === 'start') {
+                icon.textContent = activity.icon;
+                title.textContent = activity.extracurricular ? '⭐ Hora da Extra!' : 'Hora de Começar!';
+                message.textContent = `Vamos ${activity.title.toLowerCase()}!`;
+                playSound('start');
+            } else {
+                icon.textContent = '✅';
+                title.textContent = 'Concluído! 🎉';
+                message.textContent = `Muito bem! Terminamos ${activity.title.toLowerCase()}.`;
+                playSound('end');
+            }
+
+            modal.classList.add('show');
+            setTimeout(() => dismissAlarm(), 30000);
+        }
+
+        function dismissAlarm() {
+            document.getElementById('alarmModal').classList.remove('show');
+        }
+
+        function playSound(type) {
+            if (!soundEnabled || !audioContext) return;
+            audioContext.resume();
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            if (type === 'start') {
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } else {
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.frequency.setValueAtTime(freq, audioContext.currentTime + i * 0.2);
+                    gain.gain.setValueAtTime(0.2, audioContext.currentTime + i * 0.2);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.2 + 0.4);
+                    osc.start(audioContext.currentTime + i * 0.2);
+                    osc.stop(audioContext.currentTime + i * 0.2 + 0.4);
+                });
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#f5576c', '#667eea', '#ffd93d', '#48bb78', '#ff9500'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 4000);
+            }
+        }
+
+        function updateProgress() {
+            const dayData = schedule[selectedDay];
+            const total = dayData.activities.length;
+            const completed = completedActivities.size;
+            document.getElementById('progressBar').style.width = ((completed / total) * 100) + '%';
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('tdah_sound', soundEnabled);
+            document.getElementById('soundBtn').textContent = soundEnabled ? '🔔' : '🔕';
+        }
+
+        function resetDay() {
+            if (confirm('Reiniciar o dia?')) {
+                completedActivities.clear();
+                renderDailyView();
+                createConfetti();
+            }
+        }
+
+        // Área dos Pais - Login
+        function openParentLogin() {
+            currentPinInput = '';
+            updatePinDisplay();
+            document.getElementById('parentLogin').classList.add('show');
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function enterPin(num) {
+            if (currentPinInput.length < 4) {
+                currentPinInput += num;
+                updatePinDisplay();
+                if (currentPinInput.length === 4) checkPin();
+            }
+        }
+
+        function clearPin() {
+            currentPinInput = currentPinInput.slice(0, -1);
+            updatePinDisplay();
+        }
+
+        function updatePinDisplay() {
+            const display = document.getElementById('pinDisplay');
+            const dots = '•'.repeat(4 - currentPinInput.length);
+            const nums = currentPinInput;
+            display.textContent = nums + dots;
+            display.style.color = currentPinInput.length > 0 ? '#667eea' : '#2d3748';
+        }
+
+        function checkPin() {
+            if (currentPinInput === parentPin) {
+                document.getElementById('parentLogin').classList.remove('show');
+                openParentPanel();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                currentPinInput = '';
+                setTimeout(updatePinDisplay, 500);
+            }
+        }
+
+        function cancelLogin() {
+            document.getElementById('parentLogin').classList.remove('show');
+        }
+
+        // Área dos Pais - Painel
+        function openParentPanel() {
+            currentEditingExtras = [];
+            renderExtracurricularEditor();
+            document.getElementById('parentPanel').classList.add('show');
+        }
+
+        function closeParentPanel() {
+            document.getElementById('parentPanel').classList.remove('show');
+        }
+
+        function renderExtracurricularEditor() {
+            const container = document.getElementById('extracurricularList');
+            container.innerHTML = '';
+            currentEditingExtras = [];
+
+            // Coletar todas as atividades extracurriculares únicas
+            const uniqueExtras = new Map();
+            
+            for (let day = 0; day < 7; day++) {
+                schedule[day].activities.forEach((act, idx) => {
+                    if (act.extracurricular) {
+                        const key = act.title + act.start;
+                        if (!uniqueExtras.has(key)) {
+                            uniqueExtras.set(key, {
+                                ...act,
+                                days: [day],
+                                indices: [{day, idx}]
+                            });
+                        } else {
+                            const existing = uniqueExtras.get(key);
+                            if (!existing.days.includes(day)) {
+                                existing.days.push(day);
+                                existing.indices.push({day, idx});
+                            }
+                        }
+                    }
+                });
+            }
+
+            uniqueExtras.forEach((extra, key) => {
+                currentEditingExtras.push(extra);
+                const editor = document.createElement('div');
+                editor.className = 'extracurricular-editor';
+                editor.dataset.key = key;
+                
+                editor.innerHTML = `
+                    <div class="editor-grid">
+                        <div class="editor-field">
+                            <label>Atividade</label>
+                            <input type="text" class="extra-title" value="${extra.title}" placeholder="Nome da atividade">
+                        </div>
+                        <div class="editor-field">
+                            <label>Início</label>
+                            <input type="time" class="extra-start" value="${extra.start}">
+                        </div>
+                        <div class="editor-field">
+                            <label>Duração (min)</label>
+                            <input type="number" class="extra-duration" value="${extra.duration}" min="5" max="300">
+                        </div>
+                        <button class="panel-btn danger" onclick="removeExtracurricular('${key}')" title="Remover">🗑️</button>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <label style="font-size: 0.8rem; color: var(--extra); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px;">Dias da Semana</label>
+                        <div class="day-checkboxes">
+                            ${['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d, i) => `
+                                <div class="day-checkbox ${extra.days.includes(i) ? 'active' : ''}" onclick="toggleExtraDay(this, '${key}', ${i})" data-day="${i}">
+                                    ${d}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(editor);
+            });
+        }
+
+        function toggleExtraDay(el, key, day) {
+            el.classList.toggle('active');
+            const extra = currentEditingExtras.find(e => (e.title + e.start) === key);
+            if (extra) {
+                if (extra.days.includes(day)) {
+                    extra.days = extra.days.filter(d => d !== day);
+                } else {
+                    extra.days.push(day);
+                }
+            }
+        }
+
+        function addExtracurricular() {
+            const newExtra = {
+                title: 'Nova Atividade',
+                start: '15:00',
+                duration: 60,
+                color: '#ff9500',
+                extracurricular: true,
+                icon: '⭐',
+                days: [1], // Segunda por padrão
+                indices: []
+            };
+            currentEditingExtras.push(newExtra);
+            renderExtracurricularEditor();
+            
+            // Scroll para o novo item
+            setTimeout(() => {
+                const editors = document.querySelectorAll('.extracurricular-editor');
+                if (editors.length > 0) {
+                    editors[editors.length - 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        }
+
+        function removeExtracurricular(key) {
+            if (confirm('Remover esta atividade de todos os dias?')) {
+                const extra = currentEditingExtras.find(e => (e.title + e.start) === key);
+                if (extra) {
+                    // Remover de todos os dias no schedule
+                    extra.days.forEach(day => {
+                        schedule[day].activities = schedule[day].activities.filter(a => 
+                            !(a.extracurricular && a.title === extra.title && a.start === extra.start)
+                        );
+                    });
+                }
+                currentEditingExtras = currentEditingExtras.filter(e => (e.title + e.start) !== key);
+                renderExtracurricularEditor();
+            }
+        }
+
+        function changePin() {
+            const p1 = document.getElementById('newPin1').value;
+            const p2 = document.getElementById('newPin2').value;
+            const p3 = document.getElementById('newPin3').value;
+            const p4 = document.getElementById('newPin4').value;
+            
+            if (p1 && p2 && p3 && p4) {
+                const newPin = p1 + p2 + p3 + p4;
+                if (newPin.length === 4) {
+                    parentPin = newPin;
+                    localStorage.setItem('tdah_pin', parentPin);
+                    alert('✅ PIN alterado com sucesso!');
+                    document.getElementById('newPin1').value = '';
+                    document.getElementById('newPin2').value = '';
+                    document.getElementById('newPin3').value = '';
+                    document.getElementById('newPin4').value = '';
+                }
+            } else {
+                alert('❌ Digite todos os 4 dígitos!');
+            }
+        }
+
+        // Navegação automática entre campos do PIN
+        document.querySelectorAll('[id^="newPin"]').forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && index < 3) {
+                    document.getElementById(`newPin${index + 2}`).focus();
+                }
+            });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                    document.getElementById(`newPin${index}`).focus();
+                }
+            });
+        });
+
+        function saveSettings() {
+            // Aplicar mudanças das atividades extras
+            currentEditingExtras.forEach(extra => {
+                // Remover ocorrências antigas
+                for (let day = 0; day < 7; day++) {
+                    schedule[day].activities = schedule[day].activities.filter(a => 
+                        !(a.extracurricular && a.title === extra.title && !extra.days.includes(day))
+                    );
+                }
+                
+                // Adicionar/atualizar em cada dia selecionado
+                extra.days.forEach(day => {
+                    const existingIndex = schedule[day].activities.findIndex(a => 
+                        a.extracurricular && a.title === extra.title
+                    );
+                    
+                    const activityData = {
+                        icon: extra.icon || '⭐',
+                        title: extra.title,
+                        start: extra.start,
+                        duration: parseInt(extra.duration),
+                        color: '#ff9500',
+                        extracurricular: true
+                    };
+                    
+                    if (existingIndex >= 0) {
+                        schedule[day].activities[existingIndex] = activityData;
+                    } else {
+                        // Inserir na posição correta (ordenado por horário)
+                        const insertIndex = schedule[day].activities.findIndex(a => {
+                            const [h1, m1] = a.start.split(':').map(Number);
+                            const [h2, m2] = extra.start.split(':').map(Number);
+                            return (h2 * 60 + m2) < (h1 * 60 + m1);
+                        });
+                        
+                        if (insertIndex >= 0) {
+                            schedule[day].activities.splice(insertIndex, 0, activityData);
+                        } else {
+                            schedule[day].activities.push(activityData);
+                        }
+                    }
+                });
+            });
+
+            localStorage.setItem('tdah_schedule', JSON.stringify(schedule));
+            
+            // Atualizar views
+            renderWeeklyView();
+            renderDailyView();
+            closeParentPanel();
+            createConfetti();
+            
+            setTimeout(() => alert('✅ Configurações salvas com sucesso!'), 300);
+        }
+
+        function exportData() {
+            const data = {
+                schedule: schedule,
+                pin: parentPin,
+                soundEnabled: soundEnabled,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rotina_tdah_backup_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (data.schedule) {
+                            schedule = data.schedule;
+                            if (data.pin) parentPin = data.pin;
+                            if (data.soundEnabled !== undefined) {
+                                soundEnabled = data.soundEnabled;
+                                localStorage.setItem('tdah_sound', soundEnabled);
+                            }
+                            
+                            localStorage.setItem('tdah_schedule', JSON.stringify(schedule));
+                            localStorage.setItem('tdah_pin', parentPin);
+                            
+                            renderExtracurricularEditor();
+                            alert('✅ Dados importados com sucesso!\n\nClique em "Salvar" para aplicar as mudanças.');
+                        } else {
+                            throw new Error('Formato inválido');
+                        }
+                    } catch (err) {
+                        alert('❌ Erro ao importar arquivo. Verifique se é um arquivo de backup válido.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+    </script>
+</body>
+</html>
