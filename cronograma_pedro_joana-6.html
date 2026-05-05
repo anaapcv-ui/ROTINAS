@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma Pedro e Joana</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pedro: #2563eb;
+    --joana: #db2777;
+    --ambos: #059669;
+    --bg: #fffbf0;
+    --radius: 18px;
+    --shadow: 0 4px 20px rgba(0,0,0,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 10% 10%, #fde68a55 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, #fbcfe855 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, #bfdbfe33 0%, transparent 60%);
+    min-height: 100vh;
+    padding: 28px 32px 60px;
+  }
+
+  .header { text-align: center; margin-bottom: 30px; }
+  .header h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 3.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #f59e0b, #ec4899, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .kids { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+  .kid-badge {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 30px; border-radius: 50px;
+    font-family: 'Baloo 2', cursive; font-size: 1.6rem; font-weight: 800;
+    color: white; box-shadow: var(--shadow);
+  }
+  .kid-badge.pedro { background: var(--pedro); }
+  .kid-badge.joana { background: var(--joana); }
+
+  .tabs {
+    display: flex; justify-content: center; gap: 12px;
+    flex-wrap: wrap; margin-bottom: 28px;
+  }
+  .tab-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 14px 28px; border: none; border-radius: 18px;
+    font-family: 'Baloo 2', cursive; font-size: 1.15rem; font-weight: 800;
+    cursor: pointer; color: white;
+    opacity: 0.5; transform: translateY(4px);
+    transition: all 0.22s ease;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.14);
+    min-width: 120px;
+  }
+  .tab-btn .tab-emoji { font-size: 2rem; line-height: 1; }
+  .tab-btn:hover { opacity: 0.78; transform: translateY(1px); }
+  .tab-btn.active { opacity: 1; transform: translateY(0); box-shadow: 0 8px 28px rgba(0,0,0,0.22); }
+  .tab-btn.seg { background: linear-gradient(135deg, #f59e0b, #f97316); }
+  .tab-btn.ter { background: linear-gradient(135deg, #10b981, #059669); }
+  .tab-btn.qua { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+  .tab-btn.qui { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+  .tab-btn.sex { background: linear-gradient(135deg, #ec4899, #db2777); }
+
+  /* LAYOUT PRINCIPAL: blocos à esquerda, sidebar à direita */
+  .day-panel { display: none; animation: fadeIn 0.28s ease; }
+  .day-panel.active { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .day-main { min-width: 0; }
+
+  /* SIDEBAR fixa */
+  .day-sidebar {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* PROGRESS */
+  .progress-section {
+    background: white; border-radius: var(--radius);
+    padding: 20px 24px; margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .progress-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .progress-row:last-child { margin-bottom: 0; }
+  .progress-label {
+    font-family: 'Baloo 2', cursive; font-size: 1.1rem; font-weight: 800;
+    width: 110px; flex-shrink: 0; white-space: nowrap;
+  }
+  .progress-label.pedro { color: var(--pedro); }
+  .progress-label.joana { color: var(--joana); }
+  .progress-bar-wrap {
+    flex: 1; height: 18px;
+    background: #f1f5f9; border-radius: 20px; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; border-radius: 20px;
+    transition: width 0.45s cubic-bezier(0.34,1.2,0.64,1);
+    min-width: 0;
+  }
+  .progress-bar.pedro { background: linear-gradient(90deg, #60a5fa, #2563eb); }
+  .progress-bar.joana { background: linear-gradient(90deg, #f472b6, #db2777); }
+  .progress-count {
+    font-size: 0.95rem; font-weight: 800; color: #64748b;
+    width: 70px; text-align: right; flex-shrink: 0;
+    transition: color 0.3s;
+  }
+  .progress-count.complete { color: #22c55e; }
+
+  /* BLOCKS */
+  .blocks { display: flex; flex-direction: column; gap: 10px; }
+
+  .pair-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+
+  .block {
+    border-radius: 16px; padding: 16px 18px;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    position: relative; overflow: hidden;
+    border-left-width: 6px;
+  }
+  .block:hover { transform: scale(1.012); box-shadow: 0 5px 18px rgba(0,0,0,0.11); }
+  .block.done { opacity: 0.52; }
+  .block.done .block-label { text-decoration: line-through; }
+  .block.done::after {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(34,197,94,0.07); pointer-events: none;
+  }
+
+  .block-top {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 8px; margin-bottom: 10px;
+  }
+  .block-main {
+    display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;
+  }
+  .block-icon { font-size: 2.4rem; flex-shrink: 0; line-height: 1; }
+  .block-icon.sm { font-size: 1.9rem; }
+  .block-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .block-time { font-size: 0.85rem; font-weight: 800; opacity: 0.52; letter-spacing: 0.02em; }
+  .block-label {
+    font-family: 'Baloo 2', cursive; font-size: 1.35rem; font-weight: 800; line-height: 1.2;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .block-label.sm { font-size: 1.15rem; }
+  .block-sub { font-size: 0.9rem; font-weight: 700; opacity: 0.65; }
+
+  .kid-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 13px; border-radius: 20px;
+    font-size: 0.9rem; font-weight: 800; color: white;
+  }
+  .kid-tag.pedro { background: var(--pedro); }
+  .kid-tag.joana { background: var(--joana); }
+
+  /* CHECKBOX */
+  .check-wrap { cursor: pointer; flex-shrink: 0; }
+  .check-wrap input[type="checkbox"] { display: none; }
+  .checkmark {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 3px solid #cbd5e1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 900;
+    transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    background: white; color: transparent;
+    user-select: none;
+  }
+  .check-wrap.pedro .checkmark { border-color: #93c5fd; }
+  .check-wrap.joana .checkmark  { border-color: #f9a8d4; }
+  .check-wrap input:checked ~ .checkmark {
+    background: #22c55e; border-color: #22c55e;
+    color: white; transform: scale(1.15);
+  }
+  .check-wrap input:checked ~ .checkmark::after { content: '✓'; }
+
+  /* BLOCK COLORS */
+  .c-almoco   { background: #fff9c4; color: #78350f; border-left: 5px solid #f59e0b; }
+  .c-higiene  { background: #e0f2fe; color: #0369a1; border-left: 5px solid #38bdf8; }
+  .c-kumon-p  { background: #d1fae5; color: #065f46; border-left: 5px solid #10b981; }
+  .c-kumon-c  { background: #ecfdf5; color: #065f46; border-left: 5px solid #6ee7b7; }
+  .c-estudo   { background: #dbeafe; color: #1e3a8a; border-left: 5px solid #3b82f6; }
+  .c-estudo2  { background: #bfdbfe; color: #1e3a8a; border-left: 5px solid #2563eb; }
+  .c-jiujitsu { background: #fee2e2; color: #7f1d1d; border-left: 5px solid #ef4444; }
+  .c-futebol  { background: #ffedd5; color: #7c2d12; border-left: 5px solid #f97316; }
+  .c-volei    { background: #e0f2fe; color: #0c4a6e; border-left: 5px solid #0ea5e9; }
+  .c-glorinha { background: #fce7f3; color: #831843; border-left: 5px solid #ec4899; }
+  .c-organiza { background: #fefce8; color: #713f12; border-left: 5px solid #eab308; }
+  .c-lanche   { background: #fff7ed; color: #7c2d12; border-left: 5px solid #fb923c; }
+  .c-banho    { background: #cffafe; color: #164e63; border-left: 5px solid #22d3ee; }
+  .c-jantar   { background: #f3e8ff; color: #4c1d95; border-left: 5px solid #a855f7; }
+  .c-familia  { background: #fdf2f8; color: #701a75; border-left: 5px solid #ec4899; }
+  .c-dormir   { background: #e0e7ff; color: #1e1b4b; border-left: 5px solid #818cf8; }
+  .c-livre    { background: #f1f5f9; color: #475569; border-left: 5px solid #94a3b8; }
+  .c-transito { background: #f8fafc; color: #64748b; border-left: 5px solid #cbd5e1; }
+  .c-trocar   { background: #f0fdf4; color: #166534; border-left: 5px solid #86efac; }
+  .c-esporte  { background: #fff1f2; color: #881337; border-left: 5px solid #fb7185; }
+  .c-capoeira { background: #fef3c7; color: #78350f; border-left: 5px solid #d97706; }
+
+  /* NOTES SIDEBAR */
+  .notes-section {
+    background: white;
+    border-radius: var(--radius); padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+  .notes-title {
+    font-family: 'Baloo 2', cursive; font-size: 1.2rem; font-weight: 800;
+    color: #475569; margin-bottom: 12px;
+  }
+  .notes-textarea {
+    width: 100%; min-height: 260px;
+    padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px;
+    font-family: 'Nunito', sans-serif; font-size: 1.05rem;
+    color: #334155; resize: vertical; outline: none;
+    transition: border-color 0.2s; background: #fafafa;
+    line-height: 1.6;
+  }
+  .notes-textarea:focus { border-color: #a5b4fc; background: white; }
+  .notes-saved {
+    font-size: 0.85rem; font-weight: 700; color: #22c55e;
+    text-align: right; margin-top: 6px; height: 18px;
+    opacity: 0; transition: opacity 0.5s;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: center;
+    margin: 28px auto 0;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 16px; border-radius: 30px;
+    font-size: 0.95rem; font-weight: 700;
+    background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+  }
+  .legend-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+
+  .print-btn {
+    display: block; margin: 20px auto 0; padding: 14px 36px;
+    background: linear-gradient(135deg, #f59e0b, #ec4899);
+    color: white; border: none; border-radius: 50px;
+    font-family: 'Baloo 2', cursive; font-size: 1.15rem; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 18px rgba(236,72,153,0.3);
+    transition: transform 0.15s;
+  }
+  .print-btn:hover { transform: translateY(-2px); }
+
+  /* TOOLBAR (Zerar dia + Filtros) */
+  .toolbar {
+    display: flex; justify-content: center; align-items: center;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .toolbar-group {
+    display: flex; gap: 6px; align-items: center;
+    background: white; padding: 6px 12px; border-radius: 50px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .toolbar-label {
+    font-family: 'Baloo 2', cursive; font-size: 0.85rem;
+    font-weight: 700; color: #94a3b8; margin-right: 4px;
+  }
+  .tool-btn {
+    border: none; border-radius: 50px; padding: 7px 16px;
+    font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; transition: all 0.18s;
+    background: #f1f5f9; color: #475569;
+  }
+  .tool-btn:hover { background: #e2e8f0; transform: translateY(-1px); }
+  .tool-btn.active { color: white; }
+  .tool-btn.filter-p.active { background: var(--pedro); }
+  .tool-btn.filter-j.active { background: var(--joana); }
+  .tool-btn.filter-pj.active { background: var(--ambos); }
+  .tool-btn.reset-btn {
+    background: #fef2f2; color: #dc2626;
+    border: 2px solid #fecaca;
+  }
+  .tool-btn.reset-btn:hover { background: #fee2e2; }
+
+  /* DESTAQUE HORÁRIO ATUAL */
+  .block.current-time {
+    box-shadow: 0 0 0 3px #facc15, 0 4px 20px rgba(250,204,21,0.35);
+    animation: pulseGlow 2.5s ease-in-out infinite;
+    position: relative;
+  }
+  .block.current-time::before {
+    content: '⏰ AGORA';
+    position: absolute; top: -10px; right: 12px;
+    background: #facc15; color: #78350f;
+    font-size: 0.7rem; font-weight: 800;
+    padding: 2px 10px; border-radius: 10px;
+    font-family: 'Baloo 2', cursive;
+    z-index: 2;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 3px #facc15, 0 4px 20px rgba(250,204,21,0.25); }
+    50% { box-shadow: 0 0 0 5px #facc15, 0 4px 28px rgba(250,204,21,0.45); }
+  }
+
+  /* RESUMO SEMANAL */
+  .weekly-panel { display: none; animation: fadeIn 0.28s ease; }
+  .weekly-panel.active { display: block; }
+  .weekly-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px; margin-bottom: 24px;
+  }
+  .weekly-card {
+    background: white; border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .weekly-card h3 {
+    font-family: 'Baloo 2', cursive; font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+  .weekly-stat {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-bottom: 10px;
+  }
+  .weekly-stat .kid-name {
+    font-family: 'Baloo 2', cursive; font-weight: 800;
+    font-size: 1rem; width: 80px; text-align: right;
+  }
+  .weekly-stat .kid-name.pedro { color: var(--pedro); }
+  .weekly-stat .kid-name.joana { color: var(--joana); }
+  .weekly-bar-wrap {
+    flex: 1; max-width: 180px; height: 16px;
+    background: #f1f5f9; border-radius: 20px; overflow: hidden;
+  }
+  .weekly-bar {
+    height: 100%; border-radius: 20px; transition: width 0.5s;
+  }
+  .weekly-bar.pedro { background: linear-gradient(90deg, #60a5fa, #2563eb); }
+  .weekly-bar.joana { background: linear-gradient(90deg, #f472b6, #db2777); }
+  .weekly-pct {
+    font-weight: 800; font-size: 0.9rem; color: #64748b; width: 50px;
+  }
+  .weekly-trophy {
+    font-size: 3rem; margin: 10px 0;
+  }
+  .weekly-msg {
+    font-family: 'Baloo 2', cursive; font-size: 1.1rem;
+    color: #475569;
+  }
+
+  /* ESTRELAS POR DIA */
+  .stars-row {
+    display: flex; justify-content: center; gap: 6px;
+    margin: 6px 0 2px;
+  }
+  .star-kid {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.8rem; font-weight: 700;
+  }
+  .star-kid.pedro { color: var(--pedro); }
+  .star-kid.joana { color: var(--joana); }
+  .star-kid .stars { font-size: 1.1rem; letter-spacing: 1px; }
+  .star-kid .stars-empty { opacity: 0.2; }
+
+  /* CONQUISTAS */
+  .achievements-card {
+    background: white; border-radius: var(--radius);
+    padding: 20px 24px; box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .achievements-card h3 {
+    font-family: 'Baloo 2', cursive; font-size: 1.3rem;
+    margin-bottom: 14px; text-align: center;
+  }
+  .badges-grid {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  }
+  .badge {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; padding: 12px 14px; border-radius: 14px;
+    min-width: 100px; text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .badge.unlocked {
+    background: linear-gradient(135deg, #fef9c3, #fde68a);
+    box-shadow: 0 2px 12px rgba(250,204,21,0.3);
+  }
+  .badge.unlocked:hover { transform: scale(1.05); }
+  .badge.locked {
+    background: #f1f5f9; opacity: 0.5;
+  }
+  .badge-icon { font-size: 2rem; }
+  .badge-name {
+    font-family: 'Baloo 2', cursive; font-size: 0.8rem;
+    font-weight: 700; color: #475569; line-height: 1.2;
+  }
+  .badge.unlocked .badge-name { color: #78350f; }
+  .badge-who {
+    font-size: 0.7rem; font-weight: 800; color: #94a3b8;
+  }
+  .badge.unlocked .badge-who { color: #92400e; }
+
+  /* DESAFIO DA SEMANA */
+  .challenge-card {
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    border: 2px solid #c4b5fd; border-radius: var(--radius);
+    padding: 18px 24px; margin-bottom: 20px; text-align: center;
+  }
+  .challenge-card h3 {
+    font-family: 'Baloo 2', cursive; font-size: 1.2rem;
+    color: #5b21b6; margin-bottom: 8px;
+  }
+  .challenge-text {
+    font-size: 1rem; font-weight: 600; color: #6d28d9;
+    margin-bottom: 10px;
+  }
+  .challenge-status {
+    font-family: 'Baloo 2', cursive; font-size: 1.1rem;
+    font-weight: 800;
+  }
+  .challenge-status.done { color: #16a34a; }
+  .challenge-status.pending { color: #d97706; }
+
+  /* HISTÓRICO */
+  .history-card {
+    background: white; border-radius: var(--radius);
+    padding: 20px 24px; box-shadow: var(--shadow); margin-bottom: 20px;
+  }
+  .history-card h3 {
+    font-family: 'Baloo 2', cursive; font-size: 1.2rem;
+    margin-bottom: 14px; text-align: center;
+  }
+  .history-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; font-size: 0.9rem;
+  }
+  .history-label {
+    width: 110px; font-weight: 700; color: #64748b;
+    text-align: right; flex-shrink: 0; font-size: 0.85rem;
+  }
+  .history-bar-wrap {
+    flex: 1; height: 20px; background: #f1f5f9;
+    border-radius: 12px; overflow: hidden; position: relative;
+  }
+  .history-bar-inner {
+    height: 100%; border-radius: 12px; transition: width 0.6s;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8px; font-size: 0.75rem; font-weight: 800; color: white;
+    min-width: 0;
+  }
+  .history-bar-inner.pedro { background: linear-gradient(90deg, #60a5fa, #2563eb); }
+  .history-bar-inner.joana { background: linear-gradient(90deg, #f472b6, #db2777); }
+  .history-arrow {
+    font-weight: 800; font-size: 1rem; width: 50px; text-align: center; flex-shrink: 0;
+  }
+  .history-arrow.up { color: #16a34a; }
+  .history-arrow.down { color: #dc2626; }
+  .history-arrow.same { color: #94a3b8; }
+
+  /* CONFETTI */
+  .confetti-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999; overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute; top: -20px;
+    width: 10px; height: 10px; border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg) scale(0.5); opacity: 0; }
+  }
+
+  /* ── MOBILE (até 768px) ───────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    body {
+      padding: 12px 10px 40px;
+      background-image: none; /* tira os círculos de gradiente, fica mais leve */
+    }
+
+    /* HEADER mais compacto */
+    .header { margin-bottom: 16px; }
+    .header h1 { font-size: 2rem; margin-bottom: 10px; }
+    .kid-badge {
+      font-size: 1.1rem; padding: 7px 18px; gap: 6px;
+    }
+    .kids { gap: 10px; }
+
+    /* ABAS dos dias: menores, em uma linha só com rolagem horizontal */
+    .tabs {
+      gap: 6px;
+      margin-bottom: 16px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      justify-content: flex-start;
+      padding: 4px 2px 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tabs::-webkit-scrollbar { height: 3px; }
+    .tab-btn {
+      min-width: 72px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .tab-btn .tab-emoji { font-size: 1.4rem; }
+
+    /* LAYOUT: vira 1 coluna (sidebar vai para baixo) */
+    .day-panel.active {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .day-sidebar {
+      position: static; /* não fica mais "grudada" rolando */
+      gap: 12px;
+    }
+
+    /* PROGRESSO compacto */
+    .progress-section { padding: 14px 16px; margin-bottom: 12px; }
+    .progress-row { gap: 8px; margin-bottom: 10px; }
+    .progress-label { font-size: 0.9rem; width: 70px; }
+    .progress-bar-wrap { height: 14px; }
+    .progress-count { font-size: 0.8rem; width: 55px; }
+
+    /* BLOCOS pareados (Pedro + Joana na mesma hora): empilhar */
+    .pair-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    /* BLOCO individual */
+    .block { padding: 12px 14px; border-radius: 14px; }
+    .block-icon { font-size: 1.9rem; }
+    .block-icon.sm { font-size: 1.5rem; }
+    .block-label { font-size: 1.05rem; }
+    .block-label.sm { font-size: 0.95rem; }
+    .block-time { font-size: 0.8rem; }
+    .block-sub { font-size: 0.8rem; }
+    .block-top { gap: 6px; margin-bottom: 6px; }
+    .block-main { gap: 9px; }
+    .kid-tag { font-size: 0.78rem; padding: 3px 9px; }
+
+    /* CHECKBOX um pouco menor mas ainda confortável p/ tocar */
+    .checkmark {
+      width: 32px; height: 32px;
+      border-width: 2px;
+      font-size: 1rem;
+    }
+
+    /* OBSERVAÇÕES */
+    .notes-section { padding: 14px 16px; }
+    .notes-title { font-size: 1rem; }
+    .notes-textarea {
+      min-height: 140px;
+      font-size: 0.95rem;
+      padding: 10px;
+    }
+
+    /* LEGENDA: mais compacta */
+    .legend {
+      gap: 6px;
+      margin-top: 18px;
+    }
+    .legend-item {
+      font-size: 0.78rem;
+      padding: 3px 10px;
+    }
+    .legend-dot { width: 10px; height: 10px; }
+
+    /* BOTÃO IMPRIMIR */
+    .print-btn {
+      padding: 11px 26px;
+      font-size: 1rem;
+      margin-top: 14px;
+    }
+
+    /* TOOLBAR mobile */
+    .toolbar { gap: 8px; margin-bottom: 14px; }
+    .toolbar-group { padding: 5px 8px; gap: 4px; }
+    .tool-btn { padding: 5px 12px; font-size: 0.78rem; }
+    .toolbar-label { font-size: 0.75rem; }
+
+    /* DESTAQUE HORÁRIO ATUAL mobile */
+    .block.current-time::before { font-size: 0.6rem; top: -8px; right: 8px; padding: 1px 7px; }
+
+    /* RESUMO SEMANAL mobile */
+    .weekly-grid { grid-template-columns: 1fr; gap: 12px; }
+    .weekly-card { padding: 14px; }
+    .weekly-card h3 { font-size: 1.1rem; }
+    .badges-grid { gap: 8px; }
+    .badge { min-width: 80px; padding: 8px 10px; }
+    .badge-icon { font-size: 1.5rem; }
+    .badge-name { font-size: 0.72rem; }
+    .challenge-card { padding: 14px 16px; }
+    .history-card { padding: 14px 16px; }
+    .history-label { width: 80px; font-size: 0.78rem; }
+    .history-bar-wrap { height: 16px; }
+    .history-bar-inner { font-size: 0.68rem; }
+
+  }
+
+  /* ── CELULAR PEQUENO (até 380px) ─────────────────────────────────── */
+  @media (max-width: 380px) {
+    .header h1 { font-size: 1.7rem; }
+    .tab-btn { min-width: 64px; padding: 7px 10px; font-size: 0.78rem; }
+    .tab-btn .tab-emoji { font-size: 1.2rem; }
+    .block-label { font-size: 0.98rem; }
+    .block-icon { font-size: 1.7rem; }
+  }
+
+  @media print {
+    body { background: white; padding: 5mm; }
+    .tabs, .legend, .print-btn { display: none; }
+    .day-panel { display: grid !important; page-break-after: always; }
+    .block:hover { transform: none; }
+    .day-sidebar { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌟 Minha Semana Incrível! 🌟</h1>
+  <div class="kids">
+    <div class="kid-badge pedro">🧒 Pedro</div>
+    <div class="kid-badge joana">👧 Joana</div>
+  </div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div class="toolbar" id="toolbar">
+  <div class="toolbar-group">
+    <span class="toolbar-label">👁️ Filtro:</span>
+    <button class="tool-btn filter-pj active" onclick="setFilter('pj')">Todos</button>
+    <button class="tool-btn filter-p" onclick="setFilter('p')">🧒 Pedro</button>
+    <button class="tool-btn filter-j" onclick="setFilter('j')">👧 Joana</button>
+  </div>
+  <div class="toolbar-group">
+    <button class="tool-btn reset-btn" onclick="resetDay()">🔄 Zerar dia</button>
+  </div>
+</div>
+<div id="panels"></div>
+<div class="weekly-panel" id="weekly-panel"></div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Kumon</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Estudos</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Jiu-Jitsu 🥋</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Capoeira 🪘</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0ea5e9"></div>Vôlei 🏐</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div>Glorinha 🎵</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>🧒 Pedro</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#db2777"></div>👧 Joana</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#059669"></div>Os dois juntos</div>
+</div>
+<button class="print-btn" onclick="window.print()">🖨️ Imprimir</button>
+
+<script>
+var schedule = {
+  seg: {
+    label: 'SEGUNDA', emoji: '🌅',
+    blocks: [
+      { time: '12:15',       icon: '🍽️',   label: 'Almoço',              sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-almoco'   },
+      { time: '13:00',       icon: '🦷',    label: 'Higiene & Preparar',  who: 'pj', color: 'c-higiene'  },
+      { time: '13:15–14:30', icon: '📗',    label: 'Kumon Presencial',    who: 'pj', color: 'c-kumon-p'  },
+      { time: '15:00–15:40', icon: '📚',    label: 'Estudos',             who: 'pj', color: 'c-estudo'   },
+      { time: '15:45',       icon: '🎒',    label: 'Organizar Material',  who: 'pj', color: 'c-organiza' },
+      { time: '16:00',       icon: '🥪',    label: 'Café / Lanche',       who: 'pj', color: 'c-lanche'   },
+      { time: '16:30–17:30', icon: '🎮',    label: 'Tempo Livre!',        who: 'pj', color: 'c-livre'    },
+      { time: '17:45',       icon: '🚗',    label: 'Saída p/ Jiu-Jitsu', who: 'pj', color: 'c-transito' },
+      { time: '18:00–19:30', icon: '🥋',    label: 'Jiu-Jitsu!',         who: 'pj', color: 'c-jiujitsu' },
+      { time: '19:30',       icon: '🚿',    label: 'Banho',               who: 'pj', color: 'c-banho'    },
+      { time: '20:00',       icon: '👨‍👩‍👧‍👦',  label: 'Atividades + Janta', who: 'pj', color: 'c-familia'  },
+      { time: '21:00',       icon: '🌙',    label: 'Dormir 😴',           sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-dormir' }
+    ]
+  },
+  ter: {
+    label: 'TERÇA', emoji: '🌿',
+    blocks: [
+      { time: '12:15',       icon: '🍽️',   label: 'Almoço',              sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-almoco'   },
+      { time: '13:00–14:30', icon: '🎵',    label: 'Glorinha',            who: 'j',  color: 'c-glorinha' },
+      { time: '13:30–14:15', icon: '📗',    label: 'Kumon',               who: 'p',  color: 'c-kumon-p'  },
+      { time: '14:15–15:15', icon: '📚',    label: 'Estudos (1h)',        who: 'p',  color: 'c-estudo'   },
+      { time: '14:40–15:25', icon: '📘',    label: 'Kumon Casa',          who: 'j',  color: 'c-kumon-c'  },
+      { time: '15:15',       icon: '🎒',    label: 'Organizar',           who: 'p',  color: 'c-organiza' },
+      { time: '15:25',       icon: '🎒',    label: 'Organizar',           who: 'j',  color: 'c-organiza' },
+      { time: '15:30',       icon: '👕',    label: 'Trocar p/ Vôlei',     who: 'j',  color: 'c-trocar'   },
+      { time: '15:35',       icon: '🥪',    label: 'Café Leve',           who: 'j',  color: 'c-lanche'   },
+      { time: '15:40',       icon: '🚗',    label: 'Saída p/ Vôlei',      who: 'j',  color: 'c-transito' },
+      { time: '15:45–17:30', icon: '🏐',    label: 'Vôlei!',              who: 'j',  color: 'c-volei'    },
+      { time: '17:45',       icon: '🚿',    label: 'Banho',               who: 'pj', color: 'c-banho'    },
+      { time: '18:00–19:00', icon: '📖',    label: 'Estudos noite',       who: 'j',  color: 'c-estudo2'  },
+      { time: '20:00',       icon: '👨‍👩‍👧‍👦',  label: 'Atividades + Janta', who: 'pj', color: 'c-familia'  },
+      { time: '21:00',       icon: '🌙',    label: 'Dormir 😴',           sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-dormir' }
+    ]
+  },
+  qua: {
+    label: 'QUARTA', emoji: '⭐',
+    blocks: [
+      { time: '12:15',       icon: '🍽️',   label: 'Almoço',              sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-almoco'   },
+      { time: '13:00',       icon: '🦷',    label: 'Higiene',             who: 'pj', color: 'c-higiene'  },
+      { time: '13:30',       icon: '📘',    label: 'Kumon Casa',          who: 'pj', color: 'c-kumon-c'  },
+      { time: '13:45–15:30', icon: '📚',    label: 'Estudos',             who: 'pj', color: 'c-estudo'   },
+      { time: '14:45',       icon: '🎒',    label: 'Organizar',           who: 'pj', color: 'c-organiza' },
+      { time: '15:00–17:30', icon: '🎮',    label: 'Tempo Livre!',        who: 'pj', color: 'c-livre'    },
+      { time: '17:45',       icon: '👕',    label: 'Trocar p/ Jiu',       who: 'pj', color: 'c-trocar'   },
+      { time: '18:00–19:30', icon: '🥋',    label: 'Jiu-Jitsu!',         who: 'pj', color: 'c-jiujitsu' },
+      { time: '19:30',       icon: '🚿',    label: 'Banho',               who: 'pj', color: 'c-banho'    },
+      { time: '20:00',       icon: '👨‍👩‍👧‍👦',  label: 'Atividades + Janta', who: 'pj', color: 'c-familia'  },
+      { time: '21:00',       icon: '🌙',    label: 'Dormir 😴',           sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-dormir' }
+    ]
+  },
+  qui: {
+    label: 'QUINTA', emoji: '💜',
+    blocks: [
+      { time: '12:15',       icon: '🍽️',   label: 'Almoço',              sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-almoco'   },
+      { time: '13:00',       icon: '🦷',    label: 'Higiene',             who: 'pj', color: 'c-higiene'  },
+      { time: '13:15–14:30', icon: '📗',    label: 'Kumon Presencial',    who: 'pj', color: 'c-kumon-p'  },
+      { time: '14:45–15:45', icon: '📚',    label: 'Estudos (1h)',        who: 'p',  color: 'c-estudo'   },
+      { time: '15:45',       icon: '🎒',    label: 'Organizar',           who: 'p',  color: 'c-organiza' },
+      { time: '16:00',       icon: '🥪',    label: 'Lanche',              who: 'p',  color: 'c-lanche'   },
+      { time: '16:00',       icon: '🚗',    label: 'Saída p/ Vôlei',     who: 'j',  color: 'c-transito' },
+      { time: '16:15–17:30', icon: '🎮',    label: 'Tempo Livre!',        who: 'p',  color: 'c-livre'    },
+      { time: '16:30–17:30', icon: '🏐',    label: 'Vôlei!',             who: 'j',  color: 'c-volei'    },
+      { time: '17:45',       icon: '🚿',    label: 'Banho',               who: 'pj', color: 'c-banho'    },
+      { time: '18:30–19:30', icon: '📖',    label: 'Estudos noite',       who: 'j',  color: 'c-estudo2'  },
+      { time: '19:45',       icon: '🎒',    label: 'Organizar',           who: 'j',  color: 'c-organiza' },
+      { time: '20:00',       icon: '👨‍👩‍👧‍👦',  label: 'Atividades + Janta', who: 'pj', color: 'c-familia'  },
+      { time: '21:00',       icon: '🌙',    label: 'Dormir 😴',           sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-dormir' }
+    ]
+  },
+  sex: {
+    label: 'SEXTA', emoji: '🎉',
+    blocks: [
+      { time: '12:15',       icon: '🍽️',   label: 'Almoço',              sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-almoco'   },
+      { time: '13:00',       icon: '🦷',    label: 'Higiene',             who: 'pj', color: 'c-higiene'  },
+      { time: '13:30',       icon: '📘',    label: 'Kumon Casa',          who: 'pj', color: 'c-kumon-c'  },
+      { time: '13:45–14:45', icon: '📚',    label: 'Estudos',             who: 'pj', color: 'c-estudo'   },
+      { time: '14:45',       icon: '🎒',    label: 'Organizar',           who: 'pj', color: 'c-organiza' },
+      { time: '15:00',       icon: '👵',    label: 'Avó busca Pedro',     who: 'p',  color: 'c-transito' },
+      { time: '15:00–17:00', icon: '🎮',    label: 'Tempo Livre! 🎉',    who: 'j',  color: 'c-livre'    },
+      { time: '15:15–16:00', icon: '🪘',    label: 'Capoeira!',           who: 'p',  color: 'c-capoeira' },
+      { time: '17:00',       icon: '🚿',    label: 'Banho',               who: 'pj', color: 'c-banho'    },
+      { time: '19:30',       icon: '👨‍👩‍👧‍👦', label: 'Jantar em Família 🍜', who: 'pj', color: 'c-familia'  },
+      { time: '21:00',       icon: '🌙',    label: 'Dormir 😴',           sub: '+ escovar dentes 🦷', who: 'pj', color: 'c-dormir' }
+    ]
+  }
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var state = {};
+try { state = JSON.parse(localStorage.getItem('cronograma-v3') || '{}'); } catch(e) { state = {}; }
+function saveState() { try { localStorage.setItem('cronograma-v3', JSON.stringify(state)); } catch(e) {} }
+function cid(day, idx, kid) { return day + '-' + idx + '-' + kid; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+var currentFilter = 'pj'; // 'pj' = todos, 'p' = só Pedro, 'j' = só Joana
+var currentDay = 'seg';
+
+// ── PARSE TIME ───────────────────────────────────────────────────────────────
+function parseTime(timeStr) {
+  var parts = timeStr.split('–');
+  var start = parts[0].trim().split(':').map(Number);
+  var end = parts.length > 1 ? parts[1].trim().split(':').map(Number) : null;
+  return {
+    startH: start[0], startM: start[1] || 0,
+    endH: end ? end[0] : start[0], endM: end ? (end[1] || 0) : ((start[1] || 0) + 30)
+  };
+}
+
+// ── CURRENT TIME CHECK ───────────────────────────────────────────────────────
+function isCurrentBlock(dayKey, block) {
+  var dayMap = {1:'seg',2:'ter',3:'qua',4:'qui',5:'sex'};
+  var today = dayMap[new Date().getDay()];
+  if (dayKey !== today) return false;
+
+  var now = new Date();
+  var nowMin = now.getHours() * 60 + now.getMinutes();
+  var t = parseTime(block.time);
+  var startMin = t.startH * 60 + t.startM;
+  var endMin = t.endH * 60 + t.endM;
+  if (endMin <= startMin) endMin = startMin + 30;
+  return nowMin >= startMin && nowMin < endMin;
+}
+
+// ── RENDER BLOCK ──────────────────────────────────────────────────────────────
+function renderBlock(day, block, idx, kid) {
+  var id       = cid(day, idx, kid);
+  var isPaired = block.who === 'pj';
+  var icon     = (kid === 'p' ? block.iconP  : block.iconJ)  || block.icon  || '';
+  var label    = (kid === 'p' ? block.labelP : block.labelJ) || block.label || '';
+  var subKid   = kid === 'p' ? block.subP : block.subJ;
+  var sub      = (subKid !== undefined) ? subKid : (block.sub || '');
+  var kidClass = kid === 'p' ? 'pedro' : 'joana';
+  var kidName  = kid === 'p' ? '🧒 Pedro' : '👧 Joana';
+  var isDone   = !!state[id];
+  var isCurrent = isCurrentBlock(day, block);
+
+  return '<div class="block ' + block.color + (isDone ? ' done' : '') + (isCurrent ? ' current-time' : '') + '" id="block-' + id + '">' +
+    '<div class="block-top">' +
+      '<div class="block-main">' +
+        '<span class="block-icon' + (isPaired ? ' sm' : '') + '">' + icon + '</span>' +
+        '<div class="block-info">' +
+          '<span class="block-time">' + block.time + '</span>' +
+          '<span class="block-label' + (isPaired ? ' sm' : '') + '">' + label + '</span>' +
+          (sub ? '<span class="block-sub">' + sub + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<label class="check-wrap ' + kidClass + '" title="Marcar como feito">' +
+        '<input type="checkbox"' + (isDone ? ' checked' : '') + ' onchange="toggleCheck(\'' + day + '\',' + idx + ',\'' + kid + '\')">' +
+        '<span class="checkmark"></span>' +
+      '</label>' +
+    '</div>' +
+    '<span class="kid-tag ' + kidClass + '">' + kidName + '</span>' +
+  '</div>';
+}
+
+// ── RENDER DAY ────────────────────────────────────────────────────────────────
+function renderDay(dayKey) {
+  var day = schedule[dayKey];
+  var totals = { p: 0, j: 0 };
+  day.blocks.forEach(function(b) {
+    if (b.who === 'p' || b.who === 'pj') totals.p++;
+    if (b.who === 'j' || b.who === 'pj') totals.j++;
+  });
+
+  var blocksHtml = '';
+  day.blocks.forEach(function(block, idx) {
+    // Filter logic
+    var show = true;
+    if (currentFilter === 'p' && block.who === 'j') show = false;
+    if (currentFilter === 'j' && block.who === 'p') show = false;
+
+    if (!show) return;
+
+    if (block.who === 'pj') {
+      if (currentFilter === 'p') {
+        blocksHtml += renderBlock(dayKey, block, idx, 'p');
+      } else if (currentFilter === 'j') {
+        blocksHtml += renderBlock(dayKey, block, idx, 'j');
+      } else {
+        blocksHtml += '<div class="pair-row">' + renderBlock(dayKey, block, idx, 'p') + renderBlock(dayKey, block, idx, 'j') + '</div>';
+      }
+    } else {
+      blocksHtml += renderBlock(dayKey, block, idx, block.who);
+    }
+  });
+
+  var obsKey = 'obs-' + dayKey;
+
+  return '<div class="day-panel" id="day-' + dayKey + '">' +
+    '<div class="day-main">' +
+      '<div class="progress-section">' +
+        '<div class="progress-row">' +
+          '<span class="progress-label pedro">🧒 Pedro</span>' +
+          '<div class="progress-bar-wrap"><div class="progress-bar pedro" id="bar-' + dayKey + '-p" style="width:0%"></div></div>' +
+          '<span class="progress-count" id="cnt-' + dayKey + '-p">0/' + totals.p + '</span>' +
+        '</div>' +
+        '<div class="progress-row">' +
+          '<span class="progress-label joana">👧 Joana</span>' +
+          '<div class="progress-bar-wrap"><div class="progress-bar joana" id="bar-' + dayKey + '-j" style="width:0%"></div></div>' +
+          '<span class="progress-count" id="cnt-' + dayKey + '-j">0/' + totals.j + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="blocks">' + blocksHtml + '</div>' +
+    '</div>' +
+    '<div class="day-sidebar">' +
+      '<div class="notes-section">' +
+        '<div class="notes-title">📝 Observações do dia</div>' +
+        '<textarea class="notes-textarea" id="' + obsKey + '" placeholder="Escreva aqui suas observações sobre o dia de hoje..." oninput="debounceSave(\'' + obsKey + '\')">' + esc(state[obsKey] || '') + '</textarea>' +
+        '<div class="notes-saved" id="saved-' + obsKey + '">✓ Salvo</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+// ── STAR SYSTEM ──────────────────────────────────────────────────────────────
+function getStars(pct) {
+  if (pct === 100) return 3;
+  if (pct >= 80) return 2;
+  if (pct >= 50) return 1;
+  return 0;
+}
+function renderStars(count) {
+  var filled = '⭐'.repeat(count);
+  var empty = '<span class="stars-empty">☆</span>'.repeat(3 - count);
+  return '<span class="stars">' + filled + empty + '</span>';
+}
+
+// ── ACHIEVEMENTS ─────────────────────────────────────────────────────────────
+var achievementDefs = [
+  { id: 'first_star',   icon: '⭐',  name: 'Primeira Estrela',   desc: 'Completou um dia inteiro' },
+  { id: 'triple_star',  icon: '🌟',  name: 'Três Estrelas',      desc: '100% em 3 dias na semana' },
+  { id: 'gold_week',    icon: '🥇',  name: 'Semana de Ouro',     desc: '5 dias com 100%' },
+  { id: 'siblings',     icon: '👫',  name: 'Irmãos Campeões',    desc: 'Os dois 100% no mesmo dia' },
+  { id: 'super_week',   icon: '🏆',  name: 'Super Semana',       desc: 'Os dois acima de 90% na semana' },
+  { id: 'study_hero',   icon: '📚',  name: 'Herói dos Estudos',  desc: 'Todos os blocos de estudo marcados' }
+];
+
+function checkAchievements(dayStats, weekPctP, weekPctJ) {
+  var unlocked = {};
+  try { unlocked = JSON.parse(localStorage.getItem('cronograma-badges') || '{}'); } catch(e) { unlocked = {}; }
+  var newBadges = [];
+
+  // Per-kid checks
+  ['p','j'].forEach(function(kid) {
+    var kidKey = kid;
+    var name = kid === 'p' ? 'Pedro' : 'Joana';
+    var perfectDays = 0;
+    var allStudyDone = true;
+
+    dayStats.forEach(function(ds) {
+      var pct = kid === 'p' ? ds.pctP : ds.pctJ;
+      if (pct === 100) perfectDays++;
+    });
+
+    // Check study blocks
+    var days = ['seg','ter','qua','qui','sex'];
+    days.forEach(function(dayKey) {
+      schedule[dayKey].blocks.forEach(function(b, i) {
+        if ((b.who === kid || b.who === 'pj') &&
+            (b.color === 'c-estudo' || b.color === 'c-estudo2') &&
+            !state[cid(dayKey, i, kid)]) {
+          allStudyDone = false;
+        }
+      });
+    });
+
+    if (perfectDays >= 1 && !unlocked['first_star_' + kidKey]) {
+      unlocked['first_star_' + kidKey] = name;
+      newBadges.push('first_star');
+    }
+    if (perfectDays >= 3 && !unlocked['triple_star_' + kidKey]) {
+      unlocked['triple_star_' + kidKey] = name;
+      newBadges.push('triple_star');
+    }
+    if (perfectDays >= 5 && !unlocked['gold_week_' + kidKey]) {
+      unlocked['gold_week_' + kidKey] = name;
+      newBadges.push('gold_week');
+    }
+    if (allStudyDone && !unlocked['study_hero_' + kidKey]) {
+      unlocked['study_hero_' + kidKey] = name;
+      newBadges.push('study_hero');
+    }
+  });
+
+  // Both kids checks
+  dayStats.forEach(function(ds) {
+    if (ds.pctP === 100 && ds.pctJ === 100 && !unlocked['siblings']) {
+      unlocked['siblings'] = 'Ambos';
+      newBadges.push('siblings');
+    }
+  });
+  if (weekPctP >= 90 && weekPctJ >= 90 && !unlocked['super_week']) {
+    unlocked['super_week'] = 'Ambos';
+    newBadges.push('super_week');
+  }
+
+  try { localStorage.setItem('cronograma-badges', JSON.stringify(unlocked)); } catch(e) {}
+  return { unlocked: unlocked, newBadges: newBadges };
+}
+
+function renderAchievements(unlocked) {
+  return '<div class="achievements-card"><h3>🏅 Conquistas</h3><div class="badges-grid">' +
+    achievementDefs.map(function(a) {
+      // Check if unlocked for any kid
+      var whoP = unlocked[a.id + '_p'];
+      var whoJ = unlocked[a.id + '_j'];
+      var whoBoth = unlocked[a.id];
+      var isUnlocked = whoP || whoJ || whoBoth;
+      var whoText = whoBoth ? '👫 Ambos' : (whoP && whoJ ? '👫 Ambos' : (whoP ? '🧒 Pedro' : (whoJ ? '👧 Joana' : '')));
+      return '<div class="badge ' + (isUnlocked ? 'unlocked' : 'locked') + '" title="' + a.desc + '">' +
+        '<span class="badge-icon">' + a.icon + '</span>' +
+        '<span class="badge-name">' + a.name + '</span>' +
+        (isUnlocked ? '<span class="badge-who">' + whoText + '</span>' : '<span class="badge-who">🔒</span>') +
+      '</div>';
+    }).join('') +
+  '</div></div>';
+}
+
+// ── WEEKLY CHALLENGE ─────────────────────────────────────────────────────────
+var challenges = [
+  { text: '🎯 Completar TERÇA e QUINTA sem esquecer nenhum bloco!', check: function(ds) { return ds[1].pctP === 100 && ds[1].pctJ === 100 && ds[3].pctP === 100 && ds[3].pctJ === 100; } },
+  { text: '🎯 Pedro e Joana: os dois acima de 80% todos os dias!', check: function(ds) { return ds.every(function(d) { return d.pctP >= 80 && d.pctJ >= 80; }); } },
+  { text: '🎯 Conseguir pelo menos 2 estrelas (⭐⭐) em cada dia!', check: function(ds) { return ds.every(function(d) { return getStars(d.pctP) >= 2 && getStars(d.pctJ) >= 2; }); } },
+  { text: '🎯 Completar todos os blocos de estudo da semana!', check: function(ds) {
+    var ok = true;
+    ['seg','ter','qua','qui','sex'].forEach(function(dayKey) {
+      schedule[dayKey].blocks.forEach(function(b, i) {
+        if ((b.color === 'c-estudo' || b.color === 'c-estudo2')) {
+          if ((b.who === 'p' || b.who === 'pj') && !state[cid(dayKey, i, 'p')]) ok = false;
+          if ((b.who === 'j' || b.who === 'pj') && !state[cid(dayKey, i, 'j')]) ok = false;
+        }
+      });
+    });
+    return ok;
+  }},
+  { text: '🎯 Ter 3 dias com ⭐⭐⭐ para os dois!', check: function(ds) {
+    var count = 0;
+    ds.forEach(function(d) { if (d.pctP === 100 && d.pctJ === 100) count++; });
+    return count >= 3;
+  }}
+];
+
+function getWeekChallenge() {
+  // Pick a challenge based on the week number so it stays the same all week
+  var now = new Date();
+  var start = new Date(now.getFullYear(), 0, 1);
+  var weekNum = Math.floor(((now - start) / 86400000 + start.getDay()) / 7);
+  return challenges[weekNum % challenges.length];
+}
+
+function renderChallenge(dayStats) {
+  var ch = getWeekChallenge();
+  var done = ch.check(dayStats);
+  return '<div class="challenge-card">' +
+    '<h3>🎯 Desafio da Semana</h3>' +
+    '<div class="challenge-text">' + ch.text + '</div>' +
+    '<div class="challenge-status ' + (done ? 'done' : 'pending') + '">' +
+      (done ? '✅ Desafio cumprido! PARABÉNS! 🎉' : '⏳ Em andamento...') +
+    '</div>' +
+  '</div>';
+}
+
+// ── HISTORY ──────────────────────────────────────────────────────────────────
+function getWeekKey() {
+  var now = new Date();
+  var d = new Date(now);
+  d.setDate(d.getDate() - d.getDay() + 1); // Monday
+  return 'hist-' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function saveWeekHistory(pctP, pctJ) {
+  var key = getWeekKey();
+  var history = {};
+  try { history = JSON.parse(localStorage.getItem('cronograma-history') || '{}'); } catch(e) { history = {}; }
+  history[key] = { p: pctP, j: pctJ };
+  // Keep max 8 weeks
+  var keys = Object.keys(history).sort().reverse();
+  if (keys.length > 8) {
+    keys.slice(8).forEach(function(k) { delete history[k]; });
+  }
+  try { localStorage.setItem('cronograma-history', JSON.stringify(history)); } catch(e) {}
+  return history;
+}
+
+function renderHistory(currentPctP, currentPctJ) {
+  var history = saveWeekHistory(currentPctP, currentPctJ);
+  var keys = Object.keys(history).sort().reverse();
+  if (keys.length < 1) return '';
+
+  var rows = keys.slice(0, 5).map(function(key, i) {
+    var h = history[key];
+    var label = i === 0 ? 'Esta semana' : (i === 1 ? 'Sem. passada' : key.replace('hist-','').substring(5));
+    var prevKey = keys[i + 1];
+    var arrowP = '', arrowJ = '';
+    if (prevKey) {
+      var prev = history[prevKey];
+      arrowP = h.p > prev.p ? '↑' : (h.p < prev.p ? '↓' : '→');
+      arrowJ = h.j > prev.j ? '↑' : (h.j < prev.j ? '↓' : '→');
+    }
+    var arrowClassP = arrowP === '↑' ? 'up' : (arrowP === '↓' ? 'down' : 'same');
+    var arrowClassJ = arrowJ === '↑' ? 'up' : (arrowJ === '↓' ? 'down' : 'same');
+
+    return '<div class="history-row">' +
+      '<span class="history-label">' + label + '</span>' +
+      '<div class="history-bar-wrap"><div class="history-bar-inner pedro" style="width:' + h.p + '%">' + (h.p > 15 ? h.p + '%' : '') + '</div></div>' +
+      (arrowP ? '<span class="history-arrow ' + arrowClassP + '">' + arrowP + '</span>' : '<span class="history-arrow same"></span>') +
+    '</div>' +
+    '<div class="history-row" style="margin-bottom:16px">' +
+      '<span class="history-label" style="opacity:0">.</span>' +
+      '<div class="history-bar-wrap"><div class="history-bar-inner joana" style="width:' + h.j + '%">' + (h.j > 15 ? h.j + '%' : '') + '</div></div>' +
+      (arrowJ ? '<span class="history-arrow ' + arrowClassJ + '">' + arrowJ + '</span>' : '<span class="history-arrow same"></span>') +
+    '</div>';
+  }).join('');
+
+  return '<div class="history-card">' +
+    '<h3>📈 Evolução Semanal</h3>' +
+    '<div style="display:flex;justify-content:center;gap:20px;margin-bottom:12px;font-size:0.85rem;font-weight:700">' +
+      '<span style="color:var(--pedro)">🧒 Pedro</span>' +
+      '<span style="color:var(--joana)">👧 Joana</span>' +
+    '</div>' +
+    rows +
+  '</div>';
+}
+
+// ── CONFETTI ─────────────────────────────────────────────────────────────────
+var confettiShown = {};
+function launchConfetti() {
+  var container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+  var colors = ['#f59e0b','#ec4899','#3b82f6','#10b981','#8b5cf6','#ef4444','#06b6d4','#f97316'];
+  for (var i = 0; i < 60; i++) {
+    var piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (Math.random() * 100) + '%';
+    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 1.5) + 's';
+    container.appendChild(piece);
+  }
+  setTimeout(function() { container.remove(); }, 5000);
+}
+
+// ── RENDER WEEKLY SUMMARY ────────────────────────────────────────────────────
+function renderWeekly() {
+  var days = ['seg','ter','qua','qui','sex'];
+  var dayLabels = { seg: 'Segunda', ter: 'Terça', qua: 'Quarta', qui: 'Quinta', sex: 'Sexta' };
+  var totalP = 0, doneP = 0, totalJ = 0, doneJ = 0;
+  var dayStats = [];
+
+  var cardsHtml = days.map(function(dayKey) {
+    var day = schedule[dayKey];
+    var tp = 0, dp = 0, tj = 0, dj = 0;
+    day.blocks.forEach(function(b, i) {
+      if (b.who === 'p' || b.who === 'pj') { tp++; if (state[cid(dayKey, i, 'p')]) dp++; }
+      if (b.who === 'j' || b.who === 'pj') { tj++; if (state[cid(dayKey, i, 'j')]) dj++; }
+    });
+    totalP += tp; doneP += dp; totalJ += tj; doneJ += dj;
+
+    var pctP = tp > 0 ? Math.round(dp / tp * 100) : 0;
+    var pctJ = tj > 0 ? Math.round(dj / tj * 100) : 0;
+    dayStats.push({ pctP: pctP, pctJ: pctJ, dayKey: dayKey });
+
+    var starsP = getStars(pctP);
+    var starsJ = getStars(pctJ);
+    var dayEmoji = (starsP === 3 && starsJ === 3) ? '🌟' : (starsP + starsJ >= 4 ? '💪' : '📋');
+
+    return '<div class="weekly-card">' +
+      '<h3>' + dayEmoji + ' ' + dayLabels[dayKey] + '</h3>' +
+      '<div class="weekly-stat">' +
+        '<span class="kid-name pedro">🧒 Pedro</span>' +
+        '<div class="weekly-bar-wrap"><div class="weekly-bar pedro" style="width:' + pctP + '%"></div></div>' +
+        '<span class="weekly-pct">' + dp + '/' + tp + '</span>' +
+      '</div>' +
+      '<div class="stars-row"><span class="star-kid pedro">' + renderStars(starsP) + '</span></div>' +
+      '<div class="weekly-stat">' +
+        '<span class="kid-name joana">👧 Joana</span>' +
+        '<div class="weekly-bar-wrap"><div class="weekly-bar joana" style="width:' + pctJ + '%"></div></div>' +
+        '<span class="weekly-pct">' + dj + '/' + tj + '</span>' +
+      '</div>' +
+      '<div class="stars-row"><span class="star-kid joana">' + renderStars(starsJ) + '</span></div>' +
+    '</div>';
+  }).join('');
+
+  var pctWeekP = totalP > 0 ? Math.round(doneP / totalP * 100) : 0;
+  var pctWeekJ = totalJ > 0 ? Math.round(doneJ / totalJ * 100) : 0;
+  var bothDone = pctWeekP === 100 && pctWeekJ === 100;
+  var trophy = bothDone ? '🏆' : (pctWeekP + pctWeekJ > 120 ? '⭐' : '📊');
+  var msg = bothDone ? 'Semana completa! Parabéns, campeões!' :
+    (pctWeekP + pctWeekJ > 120 ? 'Ótimo progresso! Quase lá!' : 'Vamos completar a semana!');
+
+  // Total stars
+  var totalStarsP = 0, totalStarsJ = 0;
+  dayStats.forEach(function(ds) { totalStarsP += getStars(ds.pctP); totalStarsJ += getStars(ds.pctJ); });
+
+  // Achievements
+  var achResult = checkAchievements(dayStats, pctWeekP, pctWeekJ);
+
+  // Check for confetti trigger (challenge completed or both 100% a day)
+  var ch = getWeekChallenge();
+  var challengeDone = ch.check(dayStats);
+  if (challengeDone && !confettiShown['challenge']) {
+    confettiShown['challenge'] = true;
+    setTimeout(launchConfetti, 400);
+  }
+  dayStats.forEach(function(ds) {
+    if (ds.pctP === 100 && ds.pctJ === 100 && !confettiShown[ds.dayKey]) {
+      confettiShown[ds.dayKey] = true;
+      setTimeout(launchConfetti, 400);
+    }
+  });
+
+  document.getElementById('weekly-panel').innerHTML =
+    // Placar geral
+    '<div class="weekly-card" style="max-width:500px;margin:0 auto 20px;">' +
+      '<h3>🏅 Placar da Semana</h3>' +
+      '<div class="weekly-stat">' +
+        '<span class="kid-name pedro">🧒 Pedro</span>' +
+        '<div class="weekly-bar-wrap"><div class="weekly-bar pedro" style="width:' + pctWeekP + '%"></div></div>' +
+        '<span class="weekly-pct">' + pctWeekP + '%</span>' +
+      '</div>' +
+      '<div class="stars-row"><span class="star-kid pedro">' + totalStarsP + '/15 ⭐</span></div>' +
+      '<div class="weekly-stat">' +
+        '<span class="kid-name joana">👧 Joana</span>' +
+        '<div class="weekly-bar-wrap"><div class="weekly-bar joana" style="width:' + pctWeekJ + '%"></div></div>' +
+        '<span class="weekly-pct">' + pctWeekJ + '%</span>' +
+      '</div>' +
+      '<div class="stars-row"><span class="star-kid joana">' + totalStarsJ + '/15 ⭐</span></div>' +
+      '<div class="weekly-trophy">' + trophy + '</div>' +
+      '<div class="weekly-msg">' + msg + '</div>' +
+    '</div>' +
+    // Desafio da semana
+    renderChallenge(dayStats) +
+    // Cards por dia
+    '<div class="weekly-grid">' + cardsHtml + '</div>' +
+    // Conquistas
+    renderAchievements(achResult.unlocked) +
+    // Histórico
+    renderHistory(pctWeekP, pctWeekJ);
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────────────────
+function render() {
+  var days = ['seg','ter','qua','qui','sex'];
+  document.getElementById('tabs').innerHTML = days.map(function(d) {
+    return '<button class="tab-btn ' + d + '" onclick="showDay(\'' + d + '\')">' +
+      '<span class="tab-emoji">' + schedule[d].emoji + '</span>' + schedule[d].label + '</button>';
+  }).join('') +
+  '<button class="tab-btn" style="background:linear-gradient(135deg,#6366f1,#4f46e5);" onclick="showWeekly()">' +
+    '<span class="tab-emoji">📊</span>RESUMO</button>';
+
+  document.getElementById('panels').innerHTML = days.map(renderDay).join('');
+  days.forEach(updateProgress);
+  renderWeekly();
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────────────────────
+function toggleCheck(day, idx, kid) {
+  var id = cid(day, idx, kid);
+  state[id] = !state[id];
+  saveState();
+  var blockEl = document.getElementById('block-' + id);
+  if (blockEl) blockEl.classList.toggle('done', !!state[id]);
+  updateProgress(day);
+  renderWeekly();
+}
+
+function updateProgress(dayKey) {
+  var day = schedule[dayKey];
+  ['p','j'].forEach(function(kid) {
+    var total = 0, checked = 0;
+    day.blocks.forEach(function(b, i) {
+      if (b.who === kid || b.who === 'pj') {
+        total++;
+        if (state[cid(dayKey, i, kid)]) checked++;
+      }
+    });
+    var pct = total > 0 ? Math.round(checked / total * 100) : 0;
+    var bar = document.getElementById('bar-' + dayKey + '-' + kid);
+    var cnt = document.getElementById('cnt-' + dayKey + '-' + kid);
+    if (bar) bar.style.width = pct + '%';
+    if (cnt) {
+      cnt.textContent = (pct === 100 ? '🌟 ' : '') + checked + '/' + total;
+      cnt.classList.toggle('complete', pct === 100);
+    }
+  });
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.tool-btn[class*="filter-"]').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelector('.tool-btn.filter-' + f).classList.add('active');
+  render();
+  showDay(currentDay);
+}
+
+// ── RESET DAY ─────────────────────────────────────────────────────────────────
+function resetDay() {
+  var day = schedule[currentDay];
+  if (!day) return;
+  var label = day.label;
+  if (!confirm('Zerar todos os checks de ' + label + '?\nAs observações serão mantidas.')) return;
+  day.blocks.forEach(function(b, i) {
+    if (b.who === 'p' || b.who === 'pj') delete state[cid(currentDay, i, 'p')];
+    if (b.who === 'j' || b.who === 'pj') delete state[cid(currentDay, i, 'j')];
+  });
+  saveState();
+  render();
+  showDay(currentDay);
+}
+
+// ── DEBOUNCE SAVE NOTES ──────────────────────────────────────────────────────
+var saveTimers = {};
+function debounceSave(obsKey) {
+  clearTimeout(saveTimers[obsKey]);
+  saveTimers[obsKey] = setTimeout(function() {
+    var el = document.getElementById(obsKey);
+    if (!el) return;
+    state[obsKey] = el.value;
+    saveState();
+    var savedEl = document.getElementById('saved-' + obsKey);
+    if (savedEl) {
+      savedEl.textContent = '✓ Salvo';
+      savedEl.style.opacity = '1';
+      clearTimeout(savedEl._t);
+      savedEl._t = setTimeout(function() { savedEl.style.opacity = '0'; }, 2500);
+    }
+  }, 500);
+}
+
+// ── SHOW DAY / WEEKLY ────────────────────────────────────────────────────────
+function showDay(day) {
+  currentDay = day;
+  document.getElementById('weekly-panel').classList.remove('active');
+  document.querySelectorAll('.day-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  var panel = document.getElementById('day-' + day);
+  var btn   = document.querySelector('.tab-btn.' + day);
+  if (panel) panel.classList.add('active');
+  if (btn)   btn.classList.add('active');
+  document.getElementById('toolbar').style.display = 'flex';
+}
+
+function showWeekly() {
+  document.querySelectorAll('.day-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('weekly-panel').classList.add('active');
+  // Highlight the RESUMO tab (last tab button)
+  var tabs = document.querySelectorAll('.tab-btn');
+  tabs[tabs.length - 1].classList.add('active');
+  document.getElementById('toolbar').style.display = 'none';
+  renderWeekly();
+}
+
+// ── AUTO-HIGHLIGHT CURRENT TIME (updates every 2 min) ────────────────────────
+function refreshCurrentHighlight() {
+  document.querySelectorAll('.block.current-time').forEach(function(el) { el.classList.remove('current-time'); });
+  var dayMap = {1:'seg',2:'ter',3:'qua',4:'qui',5:'sex'};
+  var todayKey = dayMap[new Date().getDay()];
+  if (!todayKey || !schedule[todayKey]) return;
+  schedule[todayKey].blocks.forEach(function(block, idx) {
+    if (isCurrentBlock(todayKey, block)) {
+      ['p','j'].forEach(function(kid) {
+        if (block.who === kid || block.who === 'pj') {
+          var el = document.getElementById('block-' + cid(todayKey, idx, kid));
+          if (el) el.classList.add('current-time');
+        }
+      });
+    }
+  });
+}
+setInterval(refreshCurrentHighlight, 120000); // a cada 2 minutos
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+render();
+var dayMap = {1:'seg',2:'ter',3:'qua',4:'qui',5:'sex'};
+showDay(dayMap[new Date().getDay()] || 'seg');
+refreshCurrentHighlight();
+</script>
+</body>
+</html>
